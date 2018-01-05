@@ -1,8 +1,8 @@
 <?php
 
-namespace Varhall\Rest\Utils\Validation;
+namespace Varhall\Restino\Utils\Validation;
 
-use Varhall\Rest\Utils\Configuration;
+use Varhall\Restino\Utils\Configuration;
 
 /**
  * Description of Validator

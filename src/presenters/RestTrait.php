@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Varhall\Rest\Presenters;
+namespace Varhall\Restino\Presenters;
 
 /**
  * Description of RestTrait

@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Router;
+namespace Varhall\Restino\Router;
 
 use Nette\Application\Routers\Route;
 
@@ -35,11 +35,11 @@ abstract class AbstractRoute extends Route
             
             fwrite($tmp, base64_decode($data['content']));
             $_FILES['base64_file_' . $key] = $tmp;
-            
+
             $files[$key] = new \Nette\Http\FileUpload([
                 'name'      => isset($file['name']) ? $file['name'] : 'unknown_file',
                 'tmp_name'  => $tmpName,
-                'type'      => finfo_file(finfo_open(FILEINFO_MIME_TYPE), $tmpName),
+                'type'      => finfo_file(finfo_open(FILEINFO_MIME_TYPE), $tmpName),      // automatically retrieved
                 'size'      => filesize($tmpName),
                 'error'     => 0
             ]);
@@ -58,7 +58,7 @@ abstract class AbstractRoute extends Route
         
         $head = str_replace('data:', '', $head);
         list($type) = explode(';', $head);
-        
+
         return [
             'type'      => $type,
             'content'   => $content

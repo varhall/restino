@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Utils\Validation\Rules;
+namespace Varhall\Restino\Utils\Validation\Rules;
 
 /**
  * Description of Enum

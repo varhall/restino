@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Utils;
+namespace Varhall\Restino\Utils;
 
 
 /**

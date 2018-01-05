@@ -1,8 +1,8 @@
 <?php
 
-namespace Varhall\Rest\Presenters\Plugins;
+namespace Varhall\Restino\Presenters\Plugins;
 
-use \Varhall\Rest\Utils\Transformation\Transformator;
+use \Varhall\Restino\Utils\Transformation\Transformator;
 
 /**
  * Transform plugin converts input data to correct data types e.g. numeric strings

@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Router;
+namespace Varhall\Restino\Router;
 
 /**
  * Description of RestRoute

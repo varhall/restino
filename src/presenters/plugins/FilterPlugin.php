@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Presenters\Plugins;
+namespace Varhall\Restino\Presenters\Plugins;
 
 /**
  * Filters request and removes the keys which are not in $allowed array

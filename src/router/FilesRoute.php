@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Router;
+namespace Varhall\Restino\Router;
 
 /**
  * Description of RestRoute
@@ -51,7 +51,7 @@ class FilesRoute extends AbstractRoute
             
             $params['action'] = strtolower($action);
             $params['data'] = $data;
-            
+
             if ($files)
                 $params['files'] = $files;
             

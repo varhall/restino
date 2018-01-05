@@ -1,8 +1,8 @@
 <?php
 
-namespace Varhall\Rest\Utils\Transformation;
+namespace Varhall\Restino\Utils\Transformation;
 
-use Varhall\Rest\Utils\Configuration;
+use Varhall\Restino\Utils\Configuration;
 
 /**
  * Description of Transformator

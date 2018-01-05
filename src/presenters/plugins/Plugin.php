@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Presenters\Plugins;
+namespace Varhall\Restino\Presenters\Plugins;
 
 use Nette\Application\UI\Presenter;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Varhall\Rest\Presenters\Plugins;
+namespace Varhall\Restino\Presenters\Plugins;
 
-use \Varhall\Rest\Utils\Validation\Validator;
+use \Varhall\Restino\Utils\Validation\Validator;
 
 /**
  * Validation plugin checks the given data 

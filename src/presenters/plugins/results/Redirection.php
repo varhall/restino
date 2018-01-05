@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Presenters\Plugins\Results;
+namespace Varhall\Restino\Presenters\Plugins\Results;
 
 /**
  * Description of Redirection

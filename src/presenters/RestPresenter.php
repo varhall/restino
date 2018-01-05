@@ -1,13 +1,13 @@
 <?php
 
-namespace Varhall\Rest\Presenters;
+namespace Varhall\Restino\Presenters;
 
 /**
  * Zakladni presenter pro administracni modul
  * 
  * @author Ondrej Sibrava <ondrej.sibrava@varhall.cz>
  */
-trait Resourced
+trait RestPresenter
 {       
     use RestTrait;
     

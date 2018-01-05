@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Rest\Utils\Transformation\Transformators;
+namespace Varhall\Restino\Utils\Transformation\Transformators;
 
 /**
  * Description of Uppercase
