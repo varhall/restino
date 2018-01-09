@@ -3,6 +3,8 @@
 
 namespace Varhall\Restino\Presenters;
 
+
+
 /**
  * Description of RestTrait
  *
@@ -280,12 +282,14 @@ trait RestTrait
     {
         if (empty($data))
             return parent::sendJson('');
-        
+
+        $pagination = NULL;
+
         // filter, order, paginate
         if ($data instanceof \Nette\Database\Table\Selection) {
             $this->filterResponse($data, $this->getJsonResponseOption($options, 'filter', 'query'), $this->getJsonResponseOption($options, 'filter_exclude', []));   
             $this->orderResponse($data);
-            $this->paginateResponse($data);
+            $pagination = $this->paginateResponse($data);
         }
         
         // build response
@@ -308,6 +312,13 @@ trait RestTrait
         
         // exclude
         $this->excludeProperty($response, $this->getJsonResponseOption($options, 'field_exclude', []));
+
+        if ($pagination) {
+            $response = [
+                'pagination'    => $pagination,
+                'results'       => $response
+            ];
+        }
 
         return parent::sendJson($response);
     }
@@ -425,7 +436,7 @@ trait RestTrait
     private function expandResponse($response, $source, $expandFields)
     {
         $query = array_map('trim', explode(',', $this->getHttpRequest()->getQuery('expand', '')));
-        $expandFields = array_merge($expandFields, $query);
+        $expandFields = array_merge((array) $expandFields, $query);
 
         $definitions = $this->expandDefinition();
 
@@ -737,8 +748,29 @@ trait RestTrait
     {
         $limit = $this->getHttpRequest()->getQuery('limit');
         $offset = $this->getHttpRequest()->getQuery('offset');
-                
-        if (!empty($limit))
+        $total = NULL;
+
+        if (!!$limit && \Nette\Utils\Validators::isNumericInt($limit)) {
+            $fullData = clone $data;
+
             $data->limit($limit, $offset);
+            $total = $fullData->count();
+
+            return [
+                'limit'         => intval($limit),
+                'offset'        => [
+                    'current'       => intval($offset),
+                    'next'          => $limit && $offset < $total - $limit
+                                            ? ($offset + $limit)
+                                            : NULL,
+                    'previous'      => $limit && $offset >= $limit
+                                            ? $offset - $limit
+                                            : NULL,
+                ],
+                'total'         => $total,
+            ];
+        }
+
+        return NULL;
     }
 }

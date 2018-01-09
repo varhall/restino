@@ -9,6 +9,15 @@ namespace Varhall\Restino\Utils\Transformation\Transformators;
  */
 class Date implements ITransformator
 {
+    private $patterns = [
+        '^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}([+\-]\d{2}:\d{2})?)?$'
+    ];
+
+    public function addPattern($pattern)
+    {
+        $this->patterns[] = $pattern;
+    }
+
     public function apply($value)
     {
         if (!is_string($value))
@@ -16,9 +25,14 @@ class Date implements ITransformator
         
         if (\Nette\Utils\Validators::isNumeric($value))
             return $value;
-        
-        $time = strtotime($value);
-        return $time ? \Nette\Utils\DateTime::from($value) : $value;
+
+        foreach ($this->patterns as $pattern) {
+            if (preg_match("/{$pattern}/i", $value)) {
+                return \Nette\Utils\DateTime::from($value);
+            }
+        }
+
+        return $value;
     }
 }
 

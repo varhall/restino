@@ -30,20 +30,35 @@ class Transformator
     {
         $this->transformators = [
             'trim'          => new Transformators\Trim(),
-            'number'        => new Transformators\Number(),
-            'date'          => new Transformators\Date(),
             'uppercase'     => new Transformators\Uppercase(),
             'lowercase'     => new Transformators\Lowercase(),
             'upperfirst'    => new Transformators\Upperfirst(),
+
+            'number'        => new Transformators\Number(),
+            'int'           => new Transformators\Number(),
+            'integer'       => new Transformators\Number(),
+            'double'        => new Transformators\Number(),
+            'float'         => new Transformators\Number(),
+
+            'bool'          => new Transformators\Boolean(),
+            'boolean'       => new Transformators\Boolean(),
+
+            'date'          => new Transformators\Date(),
         ];
     }
+
+
+    /////////////////////////// Fictive static methods //////////////////////////////
     
-    public function addTransformator($name, Transformators\ITransformator $transformate)
+    private function addTransformator($name, Transformators\ITransformator $transformate)
     {
         $this->transformators[$name] = $transformate;
-    }     
-    
-    
+    }
+
+    private function defaults()
+    {
+        return [ 'trim' ];
+    }
     
     //////////////////////////////// Transformation ////////////////////////////////
     
@@ -58,11 +73,10 @@ class Transformator
     private function transformateData(array $data, array $rules)
     {
         foreach ($data as $key => $value) {
-            $rule = isset($rules[$key]) ? $rules[$key] : $this->defaults;
-            
+            $rule = isset($rules[$key]) ? $rules[$key] : $this->defaults();
+
             $data[$key] = $this->transformField($value, $rule);
         }
-        
         return $data;
     }
     
