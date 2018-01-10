@@ -76,29 +76,16 @@ trait RestPresenter
 
     public function restCreate(array $data)
     {
-        $this->apiMethodSkeleton(function($class) use ($data, $action) {
-
-            $data = $this->filterRequestData($data, $this->filterDefinition());
-            $validationRules = $this->addValidationRule($this->extractValidationDefinition('create'), 'required');
-            $this->validateRequestData($data, $validationRules);
-
-            return $action ? call_user_func($action, $data) : $class::create($data);
+        $this->apiMethodSkeleton(function($class) use ($data) {
+            return $class::create($data);
         });
     }
 
     public function restUpdate($id, array $data)
     {
-        $this->apiMethodSkeleton(function($class) use ($id, $data, $action) {
-
-            $data = $this->filterRequestData($data, $this->filterDefinition());
-            $this->validateRequestData($data, $this->extractValidationDefinition('update'));
-
+        $this->apiMethodSkeleton(function($class) use ($id, $data) {
             $instance = $class::find($id);
-
-            if ($action)
-                call_user_func($action, $id, $data);
-            else
-                $instance->update($data);
+            $instance->update($data);
 
             return $instance;
         });
@@ -109,7 +96,7 @@ trait RestPresenter
         $this->apiMethodSkeleton(function($class) use ($id) {
             $class::find($id)->delete();
 
-            return 'ok';
+            return 'deleted';
         });
     }
 
