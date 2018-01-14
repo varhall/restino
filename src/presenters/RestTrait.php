@@ -4,7 +4,6 @@
 namespace Varhall\Restino\Presenters;
 
 
-
 /**
  * Description of RestTrait
  *
@@ -547,8 +546,19 @@ trait RestTrait
             $condition = empty($param['operator']) ? $param['field'] : "{$param['field']} {$param['operator']} ?";
             $data->where($condition, $param['value']);
         }
-        
+
+        $search = $this->getHttpRequest()->getQuery('search');
+        if (!empty($search)) {
+            $this->search($search, $data);
+        }
+
         return $data;
+    }
+
+    protected function search($value, \Nette\Database\Table\Selection &$data)
+    {
+        if ($data instanceof \Varhall\Dbino\ISearchable)
+            $data->search($value);
     }
     
     private function getFilterParameters($source = 'query', array $exclude = [])
@@ -561,7 +571,7 @@ trait RestTrait
                 $filter[] = $key . (empty($value) ? '' : '=') . $value;
             }
             
-            $exclude = array_merge($exclude, ['expand', 'order', 'limit', 'offset']);
+            $exclude = array_merge($exclude, ['expand', 'order', 'limit', 'offset', 'search']);
         
         // filter from array source
         } else if (is_array($source)) {
