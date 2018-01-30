@@ -3,6 +3,8 @@
 namespace Varhall\Restino\Router;
 
 use Nette\Application\Routers\Route;
+use Nette\InvalidArgumentException;
+use Varhall\Restino\Utils\FileUtils;
 
 /**
  * Description of RestRoute
@@ -25,44 +27,18 @@ abstract class AbstractRoute extends Route
 
         $files = [];
         foreach ($input as $key => $file) {
-            $data = $this->parseBase64( isset($file['base64']) ? $file['base64'] : $file );
-            
-            if (!$data)
-                continue;
-            
-            $tmp = tmpfile();
-            $tmpName = stream_get_meta_data($tmp)['uri'];
-            
-            fwrite($tmp, base64_decode($data['content']));
-            $_FILES['base64_file_' . $key] = $tmp;
+            try {
+                $base64 = isset($file['base64']) ? $file['base64'] : $file;
+                $name = isset($file['name']) ? $file['name'] : 'unknown_file';
 
-            $files[$key] = new \Nette\Http\FileUpload([
-                'name'      => isset($file['name']) ? $file['name'] : 'unknown_file',
-                'tmp_name'  => $tmpName,
-                'type'      => finfo_file(finfo_open(FILEINFO_MIME_TYPE), $tmpName),      // automatically retrieved
-                'size'      => filesize($tmpName),
-                'error'     => 0
-            ]);
+                $files[$key] = FileUtils::fromBase64($base64, $name);
+
+            } catch (InvalidArgumentException $ex) {
+                // skip file
+            }
         }
 
         return $files;
-    }
-    
-    protected function parseBase64($data)
-    {
-        // validates Data URI scheme (https://en.wikipedia.org/wiki/Data_URI_scheme)
-        if (!is_string($data) || !preg_match('/^data:.+;.+,.+$/i', $data))
-            return NULL;
-        
-        list($head, $content) = explode(',', $data, 2);
-        
-        $head = str_replace('data:', '', $head);
-        list($type) = explode(';', $head);
-
-        return [
-            'type'      => $type,
-            'content'   => $content
-        ];
     }
     
     /**

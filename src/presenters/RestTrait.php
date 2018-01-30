@@ -61,6 +61,16 @@ trait RestTrait
     {
         return $this->getParameter('data', []);
     }
+
+    /**
+     * Ziska vstupni soubory z pozadavku
+     *
+     * @return array
+     */
+    protected function getRequestFiles()
+    {
+        return $this->getParameter('files', []);
+    }
     
     // deprecated
     /**
