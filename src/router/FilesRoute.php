@@ -2,6 +2,8 @@
 
 namespace Varhall\Restino\Router;
 
+use Varhall\Restino\Utils\FileUtils;
+
 /**
  * Description of RestRoute
  *
@@ -31,11 +33,11 @@ class FilesRoute extends AbstractRoute
                     $action = 'upload';
                     $files = !empty($httpRequest->getFiles()) 
                                 ? array_values($httpRequest->getFiles()) 
-                                : $this->getBase64Files(json_decode(file_get_contents('php://input'), TRUE));
+                                : FileUtils::retrieveFiles(json_decode(file_get_contents('php://input'), TRUE));
                     
                     $data = !empty($request->getPost()) 
-                                ? $request->getPost() 
-                                : $this->getJsonData(json_decode(file_get_contents('php://input'), TRUE));
+                                ? $request->getPost()
+                                : FileUtils::retrieveFiles(json_decode(file_get_contents('php://input'), TRUE));
                     break;
                 
                 case 'HEAD':

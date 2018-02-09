@@ -3,6 +3,8 @@
 
 namespace Varhall\Restino\Presenters;
 
+use Varhall\Restino\Utils\FileUtils;
+
 
 /**
  * Description of RestTrait
@@ -65,11 +67,13 @@ trait RestTrait
     /**
      * Ziska vstupni soubory z pozadavku
      *
+     * @param $key Nazev klice pozadavku, kde se nachazi soubor(y)
      * @return array
      */
-    protected function getRequestFiles()
+    protected function getRequestFiles($key = 'file')
     {
-        return $this->getParameter('files', []);
+        $data = $this->getParameter('data', []);
+        return FileUtils::retrieveFiles($data, $key);
     }
     
     // deprecated
