@@ -12,20 +12,20 @@ use Varhall\Restino\Utils\Configuration;
 class Transformator
 {
     private static $instance = NULL;
-    
+
     private $transformators = NULL;
-    
+
     private $defaults       = [ 'trim', 'number', 'date' ];
-    
+
     // singleton factory method
     public static function __callStatic($name, $arguments)
     {
         if (!self::$instance)
             self::$instance = new static();
-        
+
         return call_user_func_array([self::$instance, $name], $arguments);
     }
-    
+
     private function __construct()
     {
         $this->transformators = [
@@ -44,12 +44,13 @@ class Transformator
             'boolean'       => new Transformators\Boolean(),
 
             'date'          => new Transformators\Date(),
+            'datetime'      => new Transformators\Date(),
         ];
     }
 
 
     /////////////////////////// Fictive static methods //////////////////////////////
-    
+
     private function addTransformator($name, Transformators\ITransformator $transformate)
     {
         $this->transformators[$name] = $transformate;
@@ -59,17 +60,17 @@ class Transformator
     {
         return [ 'trim' ];
     }
-    
+
     //////////////////////////////// Transformation ////////////////////////////////
-    
+
     private function transformate(array $data, array $rules, $section = NULL)
     {
         if (!empty($section))
             $rules = Configuration::extractSection($rules, $section);
-        
+
         return $this->transformateData($data, $rules);
     }
-    
+
     private function transformateData(array $data, array $rules)
     {
         foreach ($data as $key => $value) {
@@ -79,14 +80,14 @@ class Transformator
         }
         return $data;
     }
-    
+
     private function transformField($value, array $rules)
     {
         foreach ($rules as $rule) {
             if (isset($this->transformators[$rule]))
                 $value = $this->transformators[$rule]->apply($value);
         }
-        
+
         return $value;
     }
 }
