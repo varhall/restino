@@ -16,30 +16,38 @@ class RestRoute extends AbstractRoute
         if ($request != NULL) {
             $action = 'default';
             $data = NULL;
+            $params = $request->getParameters();
 
             switch ($httpRequest->getMethod()) {
                 case 'GET':
                     $action = ($request->getParameter('id')) ? 'get' : 'list';
                     $data = [ ];
                     break;
-                
+
                 case 'POST':
                     $action = 'create';
+
+                    // clone existing
+                    $clone = $request->getParameter('clone');
+                    if (!!$clone) {
+                        $action = 'clone';
+                        $params['id'] = $clone;
+                    }
+
                     $data = json_decode(file_get_contents('php://input'), TRUE);
                     break;
-                
+
                 case 'PUT':
                 case 'PATCH':
                     $action = 'update';
                     $data = json_decode(file_get_contents('php://input'), TRUE);
                     break;
-                
+
                 case 'DELETE':
                     $action = 'delete';
                     break;
             }
-            
-            $params = $request->getParameters();
+
             $params['action'] = 'rest' . ucfirst(strtolower($action));
 
             if ($data)
@@ -50,7 +58,7 @@ class RestRoute extends AbstractRoute
 
             $request->setParameters($params);
         }
-        
+
         return $request;
-    } 
+    }
 }

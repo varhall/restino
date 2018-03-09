@@ -58,6 +58,15 @@ trait RestPresenter
         $this->sendJson($result);
     }
 
+    public function renderRestClone($id, array $data)
+    {
+        $this->checkSupportedMethod('clone');
+        $this->callPlugins('clone');
+        $result = $this->restClone($id, $data);
+
+        $this->sendJson($result);
+    }
+
     /// ACTIONS
 
     public function restList()
@@ -100,6 +109,15 @@ trait RestPresenter
         });
     }
 
+    public function restClone($id, array $data)
+    {
+        $this->apiMethodSkeleton(function($class) use ($id, $data) {
+            $instance = $class::find($id);
+            $clone = $instance->duplicate($data);
+
+            return $clone;
+        });
+    }
 
     /// PROTECTED & PRIVATE METHODS
 
