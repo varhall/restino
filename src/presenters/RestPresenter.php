@@ -135,9 +135,12 @@ trait RestPresenter
         }
     }
 
-    private function callPlugins($method, array &$data = [])
+    public function callPlugins($method, array &$data = [], $plugins = NULL)
     {
-        foreach ($this->plugins() as $plugin) {
+        if (!$plugins)
+            $plugins = $this->plugins();
+
+        foreach ($plugins as $plugin) {
             if (!is_array($plugin))
                 $plugin = [ 'plugin' => $plugin ];
 
