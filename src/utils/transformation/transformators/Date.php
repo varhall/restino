@@ -10,7 +10,7 @@ namespace Varhall\Restino\Utils\Transformation\Transformators;
 class Date implements ITransformator
 {
     private $patterns = [
-        '^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}([+\-]\d{2}:\d{2})?)?$'
+        '^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(([+\-]\d{2}:\d{2})|Z)?)?$'
     ];
 
     public function addPattern($pattern)
