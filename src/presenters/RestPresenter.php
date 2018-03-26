@@ -2,6 +2,9 @@
 
 namespace Varhall\Restino\Presenters;
 
+use Nette\InvalidStateException;
+use Varhall\Restino\Presenters\Plugins\PluginConfiguration;
+
 /**
  * Zakladni presenter pro administracni modul
  *
@@ -11,88 +14,90 @@ trait RestPresenter
 {
     use RestTrait;
 
+    protected $plugins = [];
+
+
+    public function getMethod()
+    {
+        $action = strtolower($this->getAction());
+        if (!preg_match('/^rest/', $action))
+            throw new InvalidStateException('Invalid method name');
+
+        return preg_replace('/^rest/', '', $action);
+    }
+
+
     /// NETTE ACTIONS
 
-    public function renderRestList()
+    public function renderRestList(array $data = [])
     {
-        $this->checkSupportedMethod('list');
-        $this->callPlugins('list');
-        $result = $this->restList();
+        $result = $this->runRestMethod();
 
         $this->sendJson($result);
     }
 
-    public function renderRestGet($id)
+    public function renderRestGet($id, array $data = [])
     {
-        $this->checkSupportedMethod('get');
-        $this->callPlugins('get');
-        $result = $this->restGet($id);
+        $result = $this->runRestMethod();
 
         $this->sendJson($result);
     }
 
     public function renderRestCreate(array $data)
     {
-        $this->checkSupportedMethod('create');
-        $this->callPlugins('create', $data);
-        $result = $this->restCreate($data);
+        $result = $this->runRestMethod();
 
         $this->sendJson($result);
     }
 
     public function renderRestUpdate($id, array $data)
     {
-        $this->checkSupportedMethod('update');
-        $this->callPlugins('update', $data);
-        $result = $this->restUpdate($id, $data);
+        $result = $this->runRestMethod();
 
         $this->sendJson($result);
     }
 
     public function renderRestDelete($id)
     {
-        $this->checkSupportedMethod('delete');
-        $this->callPlugins('delete');
-        $result = $this->restDelete($id);
+        $result = $this->runRestMethod();
 
         $this->sendJson($result);
     }
 
     public function renderRestClone($id, array $data)
     {
-        $this->checkSupportedMethod('clone');
-        $this->callPlugins('clone');
-        $result = $this->restClone($id, $data);
+        $result = $this->runRestMethod();
 
         $this->sendJson($result);
     }
+
 
     /// ACTIONS
 
     public function restList()
     {
-        $this->apiMethodSkeleton(function($class) {
+        return $this->apiMethodSkeleton(function($class) {
             return $class::all();
         });
     }
 
-    public function restGet($id)
+    public function restGet($id, array $data = [])
     {
-        $this->apiMethodSkeleton(function($class) use ($id) {
+        return $this->apiMethodSkeleton(function($class) use ($id) {
             return $class::find($id);
         });
     }
 
     public function restCreate(array $data)
     {
-        $this->apiMethodSkeleton(function($class) use ($data) {
+        return $this->apiMethodSkeleton(function($class) use ($data) {
             return $class::create($data);
         });
     }
 
     public function restUpdate($id, array $data)
     {
-        $this->apiMethodSkeleton(function($class) use ($id, $data) {
+        return $this->apiMethodSkeleton(function($class) use ($id, $data) {
             $instance = $class::find($id);
             $instance->update($data);
 
@@ -102,7 +107,7 @@ trait RestPresenter
 
     public function restDelete($id)
     {
-        $this->apiMethodSkeleton(function($class) use ($id) {
+        return $this->apiMethodSkeleton(function($class) use ($id) {
             $class::find($id)->delete();
 
             return 'deleted';
@@ -111,7 +116,7 @@ trait RestPresenter
 
     public function restClone($id, array $data)
     {
-        $this->apiMethodSkeleton(function($class) use ($id, $data) {
+        return $this->apiMethodSkeleton(function($class) use ($id, $data) {
             $instance = $class::find($id);
             $clone = $instance->duplicate($data);
 
@@ -119,49 +124,43 @@ trait RestPresenter
         });
     }
 
+
+
     /// PROTECTED & PRIVATE METHODS
+
+    private function runRestMethod()
+    {
+        $manager = new RestRequest($this->plugins, $this);
+        return $manager->next();
+    }
 
     private function apiMethodSkeleton(callable $body)
     {
         if ($this->modelClass()) {
             $class = $this->modelClass();
 
-            $response = call_user_func($body, $class);
-
-            $this->sendJson($response);
+            return call_user_func($body, $class);
 
         } else {
-            $this->methodNotSupported();
+            $this->sendJsonError('Method not supported', \Nette\Http\Response::S405_METHOD_NOT_ALLOWED);
         }
     }
 
-    public function callPlugins($method, array &$data = [], $plugins = NULL)
+
+    /// PLUGINS (middleware)
+
+    protected function plugin($class)
     {
-        if (!$plugins)
-            $plugins = $this->plugins();
+        $plugin = PluginConfiguration::find($class, $this->plugins);
 
-        foreach ($plugins as $plugin) {
-            if (!is_array($plugin))
-                $plugin = [ 'plugin' => $plugin ];
-
-            if (isset($plugin['except']) && in_array($method, $plugin['except']))
-                continue;
-
-            if (!isset($plugin['only']) || (isset($plugin['only']) && in_array($method, $plugin['only'])))
-                $plugin['plugin']->run($data, $this, $method);
+        if (!$plugin) {
+            $plugin = new PluginConfiguration($this->plugins, $class);
+            $this->plugins[] = $plugin;
         }
+
+        return $plugin;
     }
 
-    private function checkSupportedMethod($method)
-    {
-        if (is_array($this->methodsOnly()) && !empty($this->methodsOnly()) && !in_array($method, $this->methodsOnly()))
-            $this->methodNotSupported();
-    }
-
-    private function methodNotSupported()
-    {
-        $this->sendJsonError('Method not supported', \Nette\Http\Response::S405_METHOD_NOT_ALLOWED);
-    }
 
     /// CONFIG METHODS
 
@@ -178,15 +177,6 @@ trait RestPresenter
     protected function methodsOnly()
     {
         return [];
-    }
-
-    protected function plugins()
-    {
-        return [
-            [ 'plugin' => new Plugins\FilterPlugin($this->filterDefinition()), 'only' => [ 'create', 'update' ] ],
-            new Plugins\TransformPlugin($this->transformDefinition(), $this->validationDefinition()),
-            [ 'plugin' => new Plugins\ValidatePlugin($this->validationDefinition()), 'only' => [ 'create', 'update' ] ]
-        ];
     }
 
     /**

@@ -21,7 +21,7 @@ class RestRoute extends AbstractRoute
             switch ($httpRequest->getMethod()) {
                 case 'GET':
                     $action = ($request->getParameter('id')) ? 'get' : 'list';
-                    $data = [ ];
+                    $data = $httpRequest->getQuery();
                     break;
 
                 case 'POST':

@@ -2,6 +2,7 @@
 
 namespace Varhall\Restino\Presenters\Plugins;
 
+use Varhall\Restino\Presenters\RestRequest;
 use Varhall\Restino\Utils\Configuration;
 use \Varhall\Restino\Utils\Transformation\Transformator;
 
@@ -13,21 +14,11 @@ use \Varhall\Restino\Utils\Transformation\Transformator;
  */
 class TransformPlugin extends Plugin
 {
-    protected $transformRules = [];
-
-    protected $validationRules = [];
-    
-    public function __construct(array $transformRules, array $validationRules = [])
-    {
-        $this->transformRules = $transformRules;
-        $this->validationRules = $validationRules;
-    }
-    
-    protected function handle(array &$data, \Nette\Application\UI\Presenter $presenter, $method)
+    protected  function handle(RestRequest $request, ...$args)
     {
         $rules = array_merge_recursive(
-            Configuration::extractSection($this->transformRules, $method),
-            Configuration::extractSection($this->validationRules, $method)
+            Configuration::extractSection($this->presenterCall($request->getPresenter(), 'transformDefinition'), $request->method),
+            Configuration::extractSection($this->presenterCall($request->getPresenter(), 'validationDefinition'), $request->method)
         );
 
         foreach ($rules as $property => $options) {
@@ -38,6 +29,26 @@ class TransformPlugin extends Plugin
             }
         }
 
-        $data = Transformator::transformate($data, $rules, $method);
+        $request->data = Transformator::transformate($request->data, $rules, $request->method);
+
+        return $request->next();
     }
+
+    /*protected function handle(array &$data, \Nette\Application\UI\Presenter $presenter)
+    {
+        $rules = array_merge_recursive(
+            Configuration::extractSection($this->presenterCall($presenter, 'transformDefinition'), $presenter->getMethod()),
+            Configuration::extractSection($this->presenterCall($presenter, 'validationDefinition'), $presenter->getMethod())
+        );
+
+        foreach ($rules as $property => $options) {
+            $rules[$property] = array_map(function($item) { return explode(':', $item)[0]; }, $options);
+
+            foreach (Transformator::defaults() as $defopt) {
+                array_unshift($rules[$property], $defopt);
+            }
+        }
+
+        $data = Transformator::transformate($data, $rules, $presenter->getMethod());
+    }*/
 }

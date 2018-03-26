@@ -2,6 +2,8 @@
 
 namespace Varhall\Restino\Presenters\Plugins\Results;
 
+use Nette\Http\Response;
+
 /**
  * Description of Termination
  *
@@ -11,7 +13,7 @@ class Termination implements IPluginResult
 {
     public $response    = NULL;
     
-    public $code        = \Nette\Http\Response::S400_BAD_REQUEST;
+    public $code        = Response::S400_BAD_REQUEST;
     
     public function __construct($response, $code)
     {
@@ -21,6 +23,9 @@ class Termination implements IPluginResult
     
     public function run($presenter)
     {
+        if ($this->code < 300)
+            $presenter->sendJson($this->response);
+
         $presenter->sendJsonError($this->response, $this->code);
     }
 }
