@@ -13,7 +13,7 @@ class FileUtils
 
         $files = $request[$property];
 
-        if (!is_array($files) || !(isset($request['data']) || isset($request['base64'])))
+        if (!is_array($files) || (isset($files['data']) || isset($files['base64'])) )
             $files = [ $files ];
 
         foreach ($files as $file) {
