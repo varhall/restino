@@ -65,7 +65,7 @@ class PluginConfiguration
 
     public function except($methods)
     {
-        $this->only = array_unique(array_merge($this->only, (array) $methods));
+        $this->except = array_unique(array_merge($this->except, (array) $methods));
 
         return $this;
     }
