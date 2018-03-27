@@ -15,7 +15,7 @@ class RestRoute extends AbstractRoute
 
         if ($request != NULL) {
             $action = 'default';
-            $data = NULL;
+            $data = [];
             $params = $request->getParameters();
 
             switch ($httpRequest->getMethod()) {
