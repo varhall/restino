@@ -46,6 +46,22 @@ class RestRoute extends AbstractRoute
                 case 'DELETE':
                     $action = 'delete';
                     break;
+
+                case 'OPTIONS':
+                    header('Access-Control-Allow-Origin: *');
+                    header('Access-Control-Allow-Headers: ' . join(',', [
+                        'Content-Type',
+                        'Authorization'
+                    ]));
+                    header('Access-Control-Allow-Methods:' . join(',', [
+                        'GET',
+                        'POST',
+                        'PUT',
+                        'DELETE'
+                    ]));
+                    exit;
+
+                    break;
             }
 
             $params['action'] = 'rest' . ucfirst(strtolower($action));
