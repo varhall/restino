@@ -74,6 +74,8 @@ class PluginConfiguration
     {
         $this->only = [];
         $this->except = [];
+
+        return $this;
     }
 
     public function disable()
