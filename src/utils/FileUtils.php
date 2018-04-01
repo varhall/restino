@@ -33,7 +33,7 @@ class FileUtils
         }
 
         if ($removePropety)
-            unset($file[$property]);
+            unset($files[$property]);
 
         return $result;
     }
