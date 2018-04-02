@@ -69,7 +69,7 @@ class RestRoute extends AbstractRoute
             if (empty($data))
                 $data = [];
 
-            $params['data'] = isset($data['data']) ? $data['data'] : $data;
+            $params['data'] = isset($data['request_data']) ? $data['request_data'] : $data;
 
             // filter only valid keys
             $params = array_intersect_key($params, array_flip([ 'module', 'controller', 'action', 'id', 'data' ]));
