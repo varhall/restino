@@ -24,7 +24,7 @@ class RestRequest
 
         $this->plugins = array_values(array_filter($plugins, function($item) use ($presenter) { return $item->canRun($presenter->getMethod()); }));
 
-        $this->data = $presenter->getRequest()->getParameter('data');
+        $this->data = $presenter->getRequest()->getParameter('data', []);
         $this->id = $presenter->getRequest()->getParameter('id');
         $this->method = $presenter->getMethod();
     }
