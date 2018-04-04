@@ -18,8 +18,8 @@ class FilesRoute extends AbstractRoute
         if ($request != NULL) {
             $action = 'default';
 
-            if ($httpRequest->getMethod() != 'POST' && !$request->getParameter('id'))
-                throw new \Nette\InvalidArgumentException('Missing or invalid parameter ID');
+            // if ($httpRequest->getMethod() != 'POST' && !$request->getParameter('id'))
+            //     throw new \Nette\InvalidArgumentException('Missing or invalid parameter ID');
 
             $files = NULL;
             $data = [];
