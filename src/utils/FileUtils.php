@@ -45,14 +45,19 @@ class FileUtils
         if (!$data)
             throw new \Nette\InvalidArgumentException('Given string is not valid base64 file');
 
+        return self::fromBinary(base64_decode($data['content']), $filename);
+    }
+
+    public static function fromBinary($data, $filename = NULL)
+    {
         if (empty($filename))
             $filename = 'unknown_file';
 
         $tmp = tmpfile();
         $tmpName = stream_get_meta_data($tmp)['uri'];
 
-        fwrite($tmp, base64_decode($data['content']));
-        $_FILES['base64_file_' . \Nette\Utils\Strings::webalize($filename)] = $tmp;
+        fwrite($tmp, $data);
+        $_FILES['file_' . \Nette\Utils\Strings::webalize($filename)] = $tmp;
 
         return new \Nette\Http\FileUpload([
             'name'      => $filename,
