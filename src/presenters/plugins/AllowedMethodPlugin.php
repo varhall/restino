@@ -20,12 +20,4 @@ class AllowedMethodPlugin extends Plugin
 
         return $request->next();
     }
-
-    /*protected function handle(array &$data, \Nette\Application\UI\Presenter $presenter)
-    {
-        $allowedMethods = $this->presenterCall($presenter, 'methodsOnly');
-
-        if (is_array($allowedMethods) && !empty($allowedMethods) && !in_array($presenter->getMethod(), $allowedMethods))
-            return $this->terminate('Method is unsupported', \Nette\Http\Response::S405_METHOD_NOT_ALLOWED);
-    }*/
 }

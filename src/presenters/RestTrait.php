@@ -582,7 +582,7 @@ trait RestTrait
         // filter from automatic query string source
         if ($source === 'query') {
             foreach ($this->getHttpRequest()->getQuery() as $key => $value) {
-                $filter[] = $key . (empty($value) ? '' : '=') . $value;
+                $filter[] = $key . (empty($value) && $value !== '0' ? '' : '=') . $value;
             }
             
             $exclude = array_merge($exclude, ['expand', 'order', 'limit', 'offset', 'search']);

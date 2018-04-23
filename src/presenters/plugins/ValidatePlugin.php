@@ -21,12 +21,4 @@ class ValidatePlugin extends Plugin
 
         return $request->next();
     }
-
-    /*protected function handle(array &$data, \Nette\Application\UI\Presenter $presenter)
-    {
-        $errors = Validator::validate($data, $this->presenterCall($presenter, 'validationDefinition'), $presenter->getMethod());
-
-        if (count($errors) > 0)
-            return $this->terminate(['errors' => $errors], \Nette\Http\Response::S400_BAD_REQUEST);
-    }*/
 }

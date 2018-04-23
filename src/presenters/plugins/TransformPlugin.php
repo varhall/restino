@@ -33,22 +33,4 @@ class TransformPlugin extends Plugin
 
         return $request->next();
     }
-
-    /*protected function handle(array &$data, \Nette\Application\UI\Presenter $presenter)
-    {
-        $rules = array_merge_recursive(
-            Configuration::extractSection($this->presenterCall($presenter, 'transformDefinition'), $presenter->getMethod()),
-            Configuration::extractSection($this->presenterCall($presenter, 'validationDefinition'), $presenter->getMethod())
-        );
-
-        foreach ($rules as $property => $options) {
-            $rules[$property] = array_map(function($item) { return explode(':', $item)[0]; }, $options);
-
-            foreach (Transformator::defaults() as $defopt) {
-                array_unshift($rules[$property], $defopt);
-            }
-        }
-
-        $data = Transformator::transformate($data, $rules, $presenter->getMethod());
-    }*/
 }

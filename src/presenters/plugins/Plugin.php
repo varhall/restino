@@ -25,19 +25,6 @@ abstract class Plugin
     }
 
     protected abstract function handle(RestRequest $request, ...$args);
-
-    /*public function run(array &$data, Presenter $presenter)
-    {
-        if (!$this->checkPresenterRequirements($presenter))
-            throw new InvalidArgumentException('Given presenter does not fit requirements');
-
-        $result = $this->handle($data, $presenter);
-     
-        if ($result && $result instanceof Results\IPluginResult)
-            $result->run($presenter);
-    }
-    
-    protected abstract function handle(array &$data, Presenter $presenter);*/
     
     protected function terminate($response, $code = 500)
     {

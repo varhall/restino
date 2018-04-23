@@ -101,7 +101,7 @@ trait RestPresenter
             $instance = $class::find($id);
             $instance->update($data);
 
-            return $instance;
+            return $class::find($id);
         });
     }
 

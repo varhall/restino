@@ -20,15 +20,6 @@ class CorsPlugin extends Plugin
         return $request->next();
     }
 
-    /*protected function handle(array &$data, Presenter $presenter)
-    {
-        $presenter->getHttpResponse()->setHeader('Access-Control-Allow-Origin', '*');
-
-        if ($presenter->getHttpRequest()->getMethod() === 'OPTIONS') {
-            $this->sendCORSPreflightResponse();
-        }
-    }*/
-
     protected function sendCORSPreflightResponse($presenter)
     {
         //Preflight OPTIONS request

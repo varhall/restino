@@ -17,9 +17,4 @@ class FilterPlugin extends Plugin
 
         return $request->next();
     }
-
-    /*protected function handle(array &$data, \Nette\Application\UI\Presenter $presenter)
-    {
-        $data = array_intersect_key($data, array_flip($this->presenterCall($presenter, 'filterDefinition')));
-    }*/
 }
