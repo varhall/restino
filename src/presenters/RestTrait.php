@@ -365,7 +365,7 @@ trait RestTrait
      */
     private function toSendable($data)
     {
-        if (is_array($data) || is_scalar($data))
+        if (is_array($data) || is_scalar($data) || is_null($data))
             return $data;
         
         else if ($data instanceof \Varhall\Dbino\ISerializable)
