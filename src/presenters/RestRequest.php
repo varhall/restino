@@ -46,7 +46,13 @@ class RestRequest
             return $plugin->run($this);
 
         } else {
-            $args = [ $this->id, $this->data ];
+            $args = array_filter([ $this->id, $this->data ], function($item) {
+                if (is_array($item))
+                    return TRUE;
+
+                return !!$item;
+            });
+
             return call_user_func_array([$this->presenter, 'rest' . ucfirst($this->presenter->getMethod())], $args);
         }
     }
