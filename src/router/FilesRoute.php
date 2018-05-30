@@ -23,51 +23,63 @@ class FilesRoute extends AbstractRoute
 
             $files = NULL;
             $data = [];
-            
+
             switch ($httpRequest->getMethod()) {
                 case 'GET':
                     $action = 'download';
                     break;
-                
+
                 case 'POST':
                     $action = 'upload';
-                    $files = !empty($httpRequest->getFiles()) 
-                                ? array_values($httpRequest->getFiles()) 
-                                : FileUtils::retrieveFiles(json_decode(file_get_contents('php://input'), TRUE));
-                    
-                    $data = !empty($request->getPost()) 
-                                ? $request->getPost()
-                                : FileUtils::retrieveFiles(json_decode(file_get_contents('php://input'), TRUE));
+
+                    /*
+                     upload format:
+                    {
+                        files: { data: 'base64string', name: 'filename' },
+                        data: { optionalvalues }
+                    }
+                     */
+
+                    $content = json_decode(file_get_contents('php://input'), TRUE);
+
+                    $files = !empty($httpRequest->getFiles())
+                        ? array_values($httpRequest->getFiles())
+                        : FileUtils::retrieveFiles($content, 'files');
+
+                    $data = !empty($request->getPost())
+                        ? $request->getPost()
+                        : isset($content['data']) ? $content['data'] : [];
+
                     break;
-                
+
                 case 'HEAD':
                     $action = 'meta';
                     break;
-                
+
                 case 'DELETE':
                     $action = 'delete';
                     break;
             }
 
             $params = $request->getParameters();
-            
+
             $params['action'] = strtolower($action);
             $params['data'] = $data;
 
             if ($files)
                 $params['files'] = $files;
-            
+
             $request->setParameters($params);
         }
-        
+
         return $request;
     }
-    
+
     protected function getJsonData(array $input, $dataKey = 'data')
     {
         if (!empty($dataKey) && !isset($input[$dataKey]))
-                return [];
-        
+            return [];
+
         return $input[$dataKey];
     }
 }
