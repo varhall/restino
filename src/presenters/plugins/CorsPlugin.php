@@ -2,8 +2,6 @@
 
 namespace Varhall\Restino\Presenters\Plugins;
 
-
-use Nette\Application\UI\Presenter;
 use Nette\Http\Response;
 use Varhall\Restino\Presenters\RestRequest;
 

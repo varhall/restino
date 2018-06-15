@@ -3,8 +3,10 @@
 namespace Varhall\Restino\Presenters\Plugins;
 
 use Nette\Application\UI\Presenter;
-use Nette\InvalidArgumentException;
 use Varhall\Restino\Presenters\RestRequest;
+use Varhall\Restino\Presenters\Results\IResult;
+use Varhall\Restino\Presenters\Results\Redirection;
+use Varhall\Restino\Presenters\Results\Termination;
 
 /**
  * Abstract presenter plugin. Plugin is called during request process and transforms
@@ -18,7 +20,7 @@ abstract class Plugin
     {
         $result = call_user_func_array([$this, 'handle'], array_merge([$request, $args]));
 
-        if ($result && $result instanceof Results\IPluginResult)
+        if ($result && $result instanceof IResult)
             return $result->run($request->getPresenter());
 
         return $result;
@@ -28,12 +30,12 @@ abstract class Plugin
     
     protected function terminate($response, $code = 500)
     {
-        return new Results\Termination($response, $code);
+        return new Termination($response, $code);
     }
     
     protected function redirect($destination, $args = NULL)
     {
-        return new Results\Redirection($destination, $args);
+        return new Redirection($destination, $args);
     }
 
     protected function checkPresenterRequirements(Presenter $presenter)

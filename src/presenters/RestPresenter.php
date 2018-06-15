@@ -215,7 +215,9 @@ trait RestPresenter
      */
     protected function filterDefinition()
     {
-        return array_keys($this->validationDefinition());
+        return array_map(function($x) {
+            return NULL;
+        }, array_flip(array_keys($this->validationDefinition())));
     }
 
     protected function transformDefinition()
