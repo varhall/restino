@@ -71,7 +71,7 @@ class FileUtils
     protected static function parseBase64($data)
     {
         // validates Data URI scheme (https://en.wikipedia.org/wiki/Data_URI_scheme)
-        if (!is_string($data) || !preg_match('/^data:.+;.+,.+$/i', $data))
+        if (!is_string($data) || !preg_match('/^data:.+;.+,.+$/i', substr($data, 0, 200)))
             return NULL;
 
         list($head, $content) = explode(',', $data, 2);
