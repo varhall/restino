@@ -51,7 +51,7 @@ class PluginConfiguration
 
     public function createPlugin()
     {
-        return new $this->class();
+        return new $this->class($this->parameters);
     }
 
     public function only($methods)
@@ -98,6 +98,8 @@ class PluginConfiguration
         $index = !!$after ? self::findIndex($after, $this->plugins) : count($this->plugins);
 
         array_splice($this->plugins, $index + 1, 0, $this);
+
+        return $this;
     }
 
     public function moveBefore($before = NULL)
@@ -110,5 +112,14 @@ class PluginConfiguration
         $index = !!$before ?  self::findIndex($before, $this->plugins) : 0;
 
         array_splice($this->plugins, $index, 0, $this);
+
+        return $this;
+    }
+
+    public function parameters($parameters)
+    {
+        $this->parameters = $parameters;
+
+        return $this;
     }
 }

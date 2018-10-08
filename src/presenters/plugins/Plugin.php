@@ -16,6 +16,13 @@ use Varhall\Restino\Presenters\Results\Termination;
  */
 abstract class Plugin
 {
+    protected $parameters = NULL;
+
+    public function __construct($parameters)
+    {
+        $this->parameters = $parameters;
+    }
+
     public function run(RestRequest $request, ...$args)
     {
         $result = call_user_func_array([$this, 'handle'], array_merge([$request, $args]));
