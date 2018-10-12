@@ -185,6 +185,9 @@ class Json implements IResult
 
     protected function expandDefinition()
     {
+        if (!method_exists($this->request->getPresenter(), 'expandDefinition'))
+            return [];
+
         $r = new \ReflectionMethod(get_class($this->request->getPresenter()), 'expandDefinition');
         $r->setAccessible(TRUE);
         return $r->invokeArgs($this->request->getPresenter(), []);
