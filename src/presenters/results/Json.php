@@ -252,7 +252,7 @@ class Json implements IResult
 
         // check valid columns
         $validColumns = method_exists($data, 'columns') ? $data->columns() : NULL;
-        $parameters = array_filter($parameters, function($parameter) use ($validColumns) { return $validColumns === NULL || in_array($parameter, $validColumns); });
+        $parameters = array_filter($parameters, function($parameter) use ($validColumns) { return $validColumns === NULL || in_array($parameter['field'], $validColumns); });
 
         // zpracovani specifickych hodnot
         for ($i = 0; $i < count($parameters); $i++) {
