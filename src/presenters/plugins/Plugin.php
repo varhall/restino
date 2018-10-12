@@ -25,12 +25,7 @@ abstract class Plugin
 
     public function run(RestRequest $request, ...$args)
     {
-        $result = call_user_func_array([$this, 'handle'], array_merge([$request, $args]));
-
-        if ($result && $result instanceof IResult)
-            return $result->run($request->getPresenter());
-
-        return $result;
+        return call_user_func_array([$this, 'handle'], array_merge([$request, $args]));
     }
 
     protected abstract function handle(RestRequest $request, ...$args);

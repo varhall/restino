@@ -2,6 +2,8 @@
 
 namespace Varhall\Restino\Presenters\Results;
 
+use Varhall\Restino\Presenters\RestRequest;
+
 /**
  * Description of Redirection
  *
@@ -19,8 +21,8 @@ class Redirection implements IResult
         $this->args = $args;
     }
     
-    public function run($presenter)
+    public function run(RestRequest $request)
     {
-        $presenter->redirect($this->response, $this->args);
+        $request->getPresenter()->redirect($this->response, $this->args);
     }
 }

@@ -4,6 +4,8 @@ namespace Varhall\Restino\Presenters;
 
 use Nette\InvalidStateException;
 use Varhall\Restino\Presenters\Plugins\PluginConfiguration;
+use Varhall\Restino\Presenters\Results\IResult;
+use Varhall\Restino\Presenters\Results\Json;
 
 /**
  * Zakladni presenter pro administracni modul
@@ -130,8 +132,13 @@ trait RestPresenter
 
     private function runRestMethod()
     {
-        $manager = new RestRequest($this->plugins, $this);
-        return $manager->next();
+        $request = new RestRequest($this->plugins, $this);
+        $result = $request->next();
+
+        if (!($result instanceof IResult))
+            $result = new Json($result);
+
+        $this->sendResponse($result->run($request));
     }
 
     private function apiMethodSkeleton(callable $body)

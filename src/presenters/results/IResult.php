@@ -2,12 +2,14 @@
 
 namespace Varhall\Restino\Presenters\Results;
 
+use Varhall\Restino\Presenters\RestRequest;
+
 /**
- * Description of IResult
+ * API Method result
  *
- * @author sibrava
+ * @author Ondrej Sibrava <sibrava@varhall.cz>
  */
 interface IResult
 {
-    public function run($presenter);
+    public function run(RestRequest $request);
 }
