@@ -95,7 +95,7 @@ class Json implements IResult
         if (is_array($data) || is_scalar($data) || is_null($data))
             return $data;
 
-        else if ($data instanceof \Varhall\Dbino\ISerializable)
+        else if ($data instanceof \Varhall\Utilino\ISerializable)
             return $data->toArray();
 
         else if ($data instanceof \Nette\Database\Table\Selection)
@@ -365,7 +365,7 @@ class Json implements IResult
 
     protected function search($value, \Nette\Database\Table\Selection &$data)
     {
-        if ($data instanceof \Varhall\Dbino\ISearchable)
+        if ($data instanceof \Varhall\Utilino\ISearchable)
             $data->search($value);
     }
 
