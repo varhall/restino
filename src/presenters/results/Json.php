@@ -365,7 +365,7 @@ class Json implements IResult
 
     protected function search($value, \Nette\Database\Table\Selection &$data)
     {
-        if ($data instanceof \Varhall\Utilino\ISearchable)
+        if ($data instanceof \Varhall\Utilino\Collections\ISearchable)
             $data->search($value);
     }
 
