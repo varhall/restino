@@ -2,31 +2,28 @@
 
 namespace Varhall\Restino\Presenters\Plugins;
 
-use Nette\InvalidStateException;
-
 class PluginConfiguration
 {
     protected $plugins = NULL;
 
-    protected $class = NULL;
+    protected $action = NULL;
 
-    protected $parameters = [];
+    protected $args = [];
 
     protected $only = [];
 
     protected $except = [];
 
-    public function __construct(array &$plugins, $class)
+    public function __construct(array &$plugins, $action)
     {
         $this->plugins = &$plugins;
-
-        $this->class = $class;
+        $this->action = $action;
     }
 
     public static function find($search, array $plugins)
     {
         foreach ($plugins as $plugin) {
-            if ($plugin->class === $search)
+            if ($plugin->action === $search)
                 return $plugin;
         }
 
@@ -51,7 +48,16 @@ class PluginConfiguration
 
     public function createPlugin()
     {
-        return new $this->class($this->parameters);
+        if (is_object($this->action) && $this->action instanceof Plugin)
+            return $this->action;
+
+        else if (is_string($this->action) && class_exists($this->action))
+            return new $this->action();
+
+        else if (is_callable($this->action))
+            return new ClosurePlugin($this->action);
+
+        throw new \InvalidArgumentException('Cannot create plugin');
     }
 
     public function only($methods)
@@ -116,10 +122,15 @@ class PluginConfiguration
         return $this;
     }
 
-    public function parameters($parameters)
+    public function args(...$args)
     {
-        $this->parameters = $parameters;
+        $this->args = $args;
 
         return $this;
+    }
+
+    public function getArgs()
+    {
+        return $this->args;
     }
 }

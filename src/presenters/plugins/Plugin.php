@@ -4,7 +4,6 @@ namespace Varhall\Restino\Presenters\Plugins;
 
 use Nette\Application\UI\Presenter;
 use Varhall\Restino\Presenters\RestRequest;
-use Varhall\Restino\Presenters\Results\IResult;
 use Varhall\Restino\Presenters\Results\Redirection;
 use Varhall\Restino\Presenters\Results\Termination;
 
@@ -16,25 +15,21 @@ use Varhall\Restino\Presenters\Results\Termination;
  */
 abstract class Plugin
 {
-    protected $parameters = NULL;
-
-    public function __construct($parameters)
-    {
-        $this->parameters = $parameters;
-    }
-
     public function run(RestRequest $request, ...$args)
     {
-        return call_user_func_array([$this, 'handle'], array_merge([$request, $args]));
+        if (method_exists($this, 'handle'))
+            return call_user_func_array([ $this, 'handle' ], array_merge([ $request ], $args));
+
+        return $request->next();
     }
 
-    protected abstract function handle(RestRequest $request, ...$args);
-    
+    //protected abstract function handle(RestRequest $request, ...$args);
+
     protected function terminate($response, $code = 500)
     {
         return new Termination($response, $code);
     }
-    
+
     protected function redirect($destination, $args = NULL)
     {
         return new Redirection($destination, $args);
