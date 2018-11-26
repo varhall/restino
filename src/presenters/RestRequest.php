@@ -43,7 +43,7 @@ class RestRequest
             $config = $this->plugins[$this->current++];
             $plugin = $config->createPlugin();
 
-            return $plugin->run($this);
+            return call_user_func_array([ $plugin, 'run' ], array_merge([ $this ], $config->getArgs()));
 
         } else {
             $args = array_filter([ $this->id, $this->data ], function($item) {
