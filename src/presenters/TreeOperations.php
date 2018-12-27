@@ -116,7 +116,11 @@ trait TreeOperations
 
             // update (exists in both the DB and in the array)
             if (isset($currents[$item[$cols->id]])) {
-                $currents[$item[$cols->id]]->update($values);
+                if ($this->compareChanges($currents[$item[$cols->id]], $values)) {
+                    $currents[$item[$cols->id]]->update($values);
+                    $this->objectChanged($currents[$item[$cols->id]], $values);
+                }
+
                 unset($currents[$item[$cols->id]]);
 
                 // create (does not exist in the DB)
@@ -129,5 +133,22 @@ trait TreeOperations
         foreach ($class::where($cols->id, array_keys($currents)) as $item) {
             $item->delete();
         }
+    }
+
+    protected function compareChanges($current, $values)
+    {
+        $cols = $this->treeColumns();
+
+        foreach ([ $cols->left, $cols->right ] as $col) {
+            if ($current->{$col} !== $values[$col])
+                return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    protected function objectChanged($current, $values)
+    {
+
     }
 }
