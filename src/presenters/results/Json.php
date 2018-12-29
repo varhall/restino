@@ -5,6 +5,7 @@ namespace Varhall\Restino\Presenters\Results;
 use Nette\Application\Responses\JsonResponse;
 use Nette\InvalidStateException;
 use Varhall\Restino\Presenters\RestRequest;
+use Varhall\Utilino\Collections\ISearchable;
 
 class Json implements IResult
 {
@@ -47,10 +48,20 @@ class Json implements IResult
 
         $pagination = NULL;
 
-        // filter, order, paginate
+        // filter, order
         if ($data instanceof \Nette\Database\Table\Selection) {
             $this->filterResponse($data);
             $this->orderResponse($data);
+        }
+
+        // search
+        $search = $this->getQueryArgument('search');
+        if (!empty($search)) {
+            $this->search($search, $data);
+        }
+
+        // paginate
+        if ($data instanceof \Varhall\Utilino\Collections\IPaginable || $data instanceof \Nette\Database\Table\Selection) {
             $pagination = $this->paginateResponse($data);
         }
 
@@ -286,11 +297,6 @@ class Json implements IResult
         foreach ($parameters as $param) {
             $condition = empty($param['operator']) ? $param['field'] : "{$param['field']} {$param['operator']} ?";
             $data->where($condition, $param['value']);
-        }
-
-        $search = $this->getQueryArgument('search');
-        if (!empty($search)) {
-            $this->search($search, $data);
         }
 
         return $data;
