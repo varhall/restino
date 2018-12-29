@@ -55,9 +55,8 @@ class Json implements IResult
         }
 
         // search
-        $search = $this->getQueryArgument('search');
-        if (!empty($search)) {
-            $this->search($search, $data);
+        if ($data instanceof \Varhall\Utilino\Collections\ISearchable) {
+            $this->search($data);
         }
 
         // paginate
@@ -369,10 +368,13 @@ class Json implements IResult
         return $params;
     }
 
-    protected function search($value, \Nette\Database\Table\Selection &$data)
+    protected function search(&$data)
     {
-        if ($data instanceof \Varhall\Utilino\Collections\ISearchable)
+        $value = $this->getQueryArgument('search');
+
+        if (!empty($value)) {
             $data->search($value);
+        }
     }
 
     // order & pagination
@@ -436,7 +438,7 @@ class Json implements IResult
      *
      * @param \Nette\Database\Table\Selection $data
      */
-    protected function paginateResponse(\Nette\Database\Table\Selection $data)
+    protected function paginateResponse(&$data)
     {
         $limit = $this->getQueryArgument('limit');
         $offset = $this->getQueryArgument('offset');
@@ -445,7 +447,7 @@ class Json implements IResult
         if (!!$limit && \Nette\Utils\Validators::isNumericInt($limit)) {
             $fullData = clone $data;
 
-            $data->limit($limit, $offset);
+            $data = $data->limit($limit, $offset);
             $total = $fullData->count();
 
             return [
