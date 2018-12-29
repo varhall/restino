@@ -373,7 +373,7 @@ class Json implements IResult
         $value = $this->getQueryArgument('search');
 
         if (!empty($value)) {
-            $data->search($value);
+            $data = $data->search($value);
         }
     }
 
