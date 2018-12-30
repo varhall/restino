@@ -22,7 +22,8 @@
 		"nette/di": "^2.4",
 		"nette/application": "^2.4",
 		"nette/http": "^2.4",
-		"nette/security": "^2.4"
+		"nette/security": "^2.4",
+		"varhall/utilino": "master"
 	},
 
 	"require-dev": {
