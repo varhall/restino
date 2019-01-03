@@ -293,6 +293,8 @@ class Json implements IResult
             }
         }
 
+        $parameters = array_filter($parameters);
+
         foreach ($parameters as $param) {
             $condition = empty($param['operator']) ? $param['field'] : "{$param['field']} {$param['operator']} ?";
             $data->where($condition, $param['value']);
