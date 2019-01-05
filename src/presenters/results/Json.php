@@ -105,11 +105,11 @@ class Json implements IResult
         if (is_array($data) || is_scalar($data) || is_null($data))
             return $data;
 
-        else if ($data instanceof \Nette\Database\Table\Selection || $data instanceof \Varhall\Utilino\Collections\ICollection)
-            return $this->dataToArray($data);
-
         else if ($data instanceof \Varhall\Utilino\ISerializable)
             return $data->toArray();
+
+        else if ($data instanceof \Nette\Database\Table\Selection)
+            return $this->dataToArray($data);
 
         else if ($data instanceof \Nette\Database\Table\ActiveRow)
             return $data->toArray();
