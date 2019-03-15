@@ -50,6 +50,11 @@ trait TreeOperations
         return [];
     }
 
+    protected function extendItem($item)
+    {
+        return [];
+    }
+
 
     /// TREE OPERATIONS
 
@@ -62,7 +67,7 @@ trait TreeOperations
             $r = $item->{$this->treeColumns()->right};
 
             if ($l === $left + 1 && (is_null($right) || $r < $right)) {
-                $tree[] = array_merge($item->toArray(), [
+                $tree[] = array_merge($item->toArray(), $this->extendItem($item), [
                     'children'  => $this->buildTree(array_filter($data, function($x) use ($l, $r) { return $x->{$this->treeColumns()->left} > $l && $x->{$this->treeColumns()->right} < $r; }), $l, $r)
                 ]);
 
