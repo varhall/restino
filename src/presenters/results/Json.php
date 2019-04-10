@@ -3,6 +3,7 @@
 namespace Varhall\Restino\Presenters\Results;
 
 use Nette\Application\Responses\JsonResponse;
+use Nette\Application\Responses\TextResponse;
 use Nette\InvalidStateException;
 use Varhall\Restino\Presenters\RestRequest;
 use Varhall\Utilino\Collections\ISearchable;
@@ -15,12 +16,15 @@ class Json implements IResult
 
     public $expand = [];
 
+    public $serializer = NULL;
+
     /**
      * @var RestRequest
      */
     protected $request = NULL;
 
     protected $data = NULL;
+
 
     public function __construct($data)
     {
@@ -102,7 +106,10 @@ class Json implements IResult
      */
     private function toSendable($data)
     {
-        if (is_array($data) || is_scalar($data) || is_null($data))
+        if ($this->serializer && is_callable($this->serializer))
+            return call_user_func($this->serializer, $data);
+
+        else if (is_array($data) || is_scalar($data) || is_null($data))
             return $data;
 
         else if ($data instanceof \Varhall\Utilino\ISerializable)
