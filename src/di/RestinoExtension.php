@@ -11,9 +11,7 @@ class RestinoExtension extends \Nette\DI\CompilerExtension
 {
     protected function configuration()
     {
-        return $this->getConfig([
-
-        ]);
+        return $this->getConfig();
     }
 
     public function afterCompile(\Nette\PhpGenerator\ClassType $class)
