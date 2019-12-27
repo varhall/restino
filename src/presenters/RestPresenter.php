@@ -59,7 +59,7 @@ trait RestPresenter
         $this->sendJson($result);
     }
 
-    public function renderRestDelete($id)
+    public function renderRestDelete($id, array $data = [])
     {
         $result = $this->runRestMethod();
 

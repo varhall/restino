@@ -45,6 +45,7 @@ class RestRoute extends AbstractRoute
 
                 case 'DELETE':
                     $action = 'delete';
+                    $data = $httpRequest->getQuery();
                     break;
 
                 case 'OPTIONS':
