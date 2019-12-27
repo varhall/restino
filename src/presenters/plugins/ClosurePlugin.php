@@ -10,13 +10,11 @@ class ClosurePlugin extends Plugin
 
     public function __construct(callable $closure)
     {
-        parent::__construct(NULL);
-
         $this->closure = $closure;
     }
 
     protected  function handle(RestRequest $request, ...$args)
     {
-        return call_user_func_array($this->closure, $args);
+        return call_user_func_array($this->closure, [ $request ] + $args);
     }
 }
