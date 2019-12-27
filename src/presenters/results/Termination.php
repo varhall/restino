@@ -29,6 +29,6 @@ class Termination implements IResult
             return (new Json($this->response))->run($request);
 
         $request->getPresenter()->getHttpResponse()->setCode($this->code);
-        return new JsonResponse([ 'message' => $this->response ]);
+        return new JsonResponse(is_array($this->response) ? $this->response : [ 'message' => $this->response ]);
     }
 }
