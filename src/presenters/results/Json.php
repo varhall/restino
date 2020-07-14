@@ -327,7 +327,7 @@ class Json implements IResult
     private function parseFilterParameters(array $filter, array $excluded = [])
     {
         $params = [];
-        $operators = ['>=', '<=', '<>', '=', '>', '<'];
+        $operators = ['>=', '<=', '<>', '!=', '=', '>', '<'];
 
         foreach ($filter as $raw) {
 
@@ -350,7 +350,7 @@ class Json implements IResult
                 $multi = array_map('trim', explode(',', $value));
                 if (count($multi) > 1) {
                     $value = $multi;
-                    $operator = NULL;
+                    $operator = $operator === '!=' || $operator === '<>' ? 'NOT' : NULL;
                 }
 
                 // operator LIKE
@@ -358,6 +358,9 @@ class Json implements IResult
                     $value = preg_replace('/\*+/', '%', $value);
                     $operator = 'LIKE';
                 }
+
+                if ($operator === '!=')
+                    $operator = '<>';
 
                 $params[] = [
                     'field'     => $field,
