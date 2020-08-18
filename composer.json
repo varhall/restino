@@ -17,20 +17,19 @@
 
 	"require": {
 		"php": ">=7.2.0",
-		"nette/utils": ">=2.4",
-		"nette/reflection": ">=2.3",
-		"nette/di": ">=2.4",
-		"nette/application": ">=2.4",
-		"nette/http": ">=2.4",
-		"nette/security": ">=2.4",
-		"varhall/utilino": "master"
+		"nette/utils": ">=3.0",
+		"nette/di": ">=3.0",
+		"nette/application": ">=3.0",
+		"nette/http": ">=3.0",
+		"nette/security": ">=3.0",
+		"varhall/utilino": "dev-nette-30"
 	},
 
 	"require-dev": {
 		"tracy/tracy": ">=2.4",
 		"nette/tester": ">=1.7",
-		"nette/caching": ">=2.5",
-		"nette/robot-loader": ">=2.4"
+		"nette/caching": ">=3.0",
+		"nette/robot-loader": ">=3.0"
 	},
 
 	"autoload": {
