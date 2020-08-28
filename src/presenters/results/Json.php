@@ -16,14 +16,14 @@ class Json implements IResult
 
     public $expand = [];
 
-    public $serializer = NULL;
+    public $serializer = null;
 
     /**
      * @var RestRequest
      */
-    protected $request = NULL;
+    protected $request = null;
 
-    protected $data = NULL;
+    protected $data = null;
 
 
     public function __construct($data)
@@ -50,7 +50,7 @@ class Json implements IResult
         if (empty($data))
             return [];
 
-        $pagination = NULL;
+        $pagination = null;
 
         // filter, order
         if ($data instanceof \Nette\Database\Table\Selection) {
@@ -179,7 +179,7 @@ class Json implements IResult
      */
     protected function expandResponse($response, $source)
     {
-        $query = array_map('trim', explode(',', $this->getQueryArgument('expand', '')));
+        $query = array_map('trim', explode(',', $this->getQueryArgument('expand')));
         $expandFields = array_merge((array) $this->expand, $query);
 
         $definitions = $this->expandDefinition();
@@ -206,7 +206,7 @@ class Json implements IResult
             return [];
 
         $r = new \ReflectionMethod(get_class($this->request->getPresenter()), 'expandDefinition');
-        $r->setAccessible(TRUE);
+        $r->setAccessible(true);
         return $r->invokeArgs($this->request->getPresenter(), []);
     }
 
@@ -268,8 +268,8 @@ class Json implements IResult
         $parameters = $this->getFilterParameters($data);
 
         // check valid columns
-        $validColumns = method_exists($data, 'columns') ? $data->columns() : NULL;
-        $parameters = array_filter($parameters, function($parameter) use ($validColumns) { return $validColumns === NULL || in_array($parameter['field'], $validColumns); });
+        $validColumns = method_exists($data, 'columns') ? $data->columns() : null;
+        $parameters = array_filter($parameters, function($parameter) use ($validColumns) { return $validColumns === null || in_array($parameter['field'], $validColumns); });
 
         // zpracovani specifickych hodnot
         for ($i = 0; $i < count($parameters); $i++) {
@@ -295,7 +295,7 @@ class Json implements IResult
                 unset($parameters[$i]);
 
             } else if ($parameter['value'] === 'null') {
-                $parameter['value'] = NULL;
+                $parameter['value'] = null;
                 $parameter['operator'] = ($parameter['operator'] == '!=') ? 'NOT' : '';
             }
         }
@@ -331,7 +331,7 @@ class Json implements IResult
 
         foreach ($filter as $raw) {
 
-            $parsed = FALSE;
+            $parsed = false;
             foreach ($operators as $operator) {
                 $parts = explode($operator, $raw);
                 if (count($parts) != 2)
@@ -342,7 +342,7 @@ class Json implements IResult
 
                 // pokud je parametr vylouceny, preskocit
                 if (in_array($field, $excluded)) {
-                    $parsed = TRUE;
+                    $parsed = true;
                     break;
                 }
 
@@ -350,7 +350,7 @@ class Json implements IResult
                 $multi = array_map('trim', explode(',', $value));
                 if (count($multi) > 1) {
                     $value = $multi;
-                    $operator = $operator === '!=' || $operator === '<>' ? 'NOT' : NULL;
+                    $operator = $operator === '!=' || $operator === '<>' ? 'NOT' : null;
                 }
 
                 // operator LIKE
@@ -368,7 +368,7 @@ class Json implements IResult
                     'operator'  => $operator
                 ];
 
-                $parsed = TRUE;
+                $parsed = true;
                 break;
             }
 
@@ -432,9 +432,9 @@ class Json implements IResult
         $query = array_map('trim', explode(',', $query));
 
         foreach ($query as $q) {
-            $desc = FALSE;
+            $desc = false;
             if (substr($q, 0, 1) == '-')
-                $desc = TRUE;
+                $desc = true;
 
             $params[] = [
                 'field' => $desc ? substr($q, 1) : $q,
@@ -454,7 +454,7 @@ class Json implements IResult
     {
         $limit = $this->getQueryArgument('limit');
         $offset = $this->getQueryArgument('offset');
-        $total = NULL;
+        $total = null;
 
         if (!!$limit && \Nette\Utils\Validators::isNumericInt($limit)) {
             $fullData = clone $data;
@@ -468,24 +468,24 @@ class Json implements IResult
                     'current'       => intval($offset),
                     'next'          => $limit && $offset < $total - $limit
                         ? ($offset + $limit)
-                        : NULL,
+                        : null,
                     'previous'      => $limit && $offset >= $limit
                         ? $offset - $limit
-                        : NULL,
+                        : null,
                 ],
                 'total'         => $total,
             ];
         }
 
-        return NULL;
+        return null;
     }
 
-    protected function getQueryArgument($argument = NULL)
+    protected function getQueryArgument($argument = null)
     {
         if (!$this->request)
             throw new InvalidStateException('Request has not been set yet');
 
         $httpRequest = $this->request->getPresenter()->getHttpRequest();
-        return call_user_func_array([ $httpRequest, 'getQuery' ], func_get_args());
+        return $argument ? $httpRequest->getQuery($argument) : $httpRequest->getQuery();
     }
 }

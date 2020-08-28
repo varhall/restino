@@ -9,18 +9,18 @@ namespace Varhall\Restino\Router;
  */
 class RestRoute extends AbstractRoute
 {
-    public function match(\Nette\Http\IRequest $httpRequest)
+    public function match(\Nette\Http\IRequest $httpRequest): ?array
     {
         $request = parent::match($httpRequest);
 
-        if ($request != NULL) {
+        if (!!$request) {
             $action = 'default';
             $data = [];
-            $params = $request->getParameters();
+            //$params = $request->getParameters();
 
             switch ($httpRequest->getMethod()) {
                 case 'GET':
-                    $action = ($request->getParameter('id')) ? 'get' : 'list';
+                    $action = array_key_exists('id', $request) && !!$request['id'] ? 'get' : 'list';
                     $data = $httpRequest->getQuery();
                     break;
 
@@ -28,10 +28,10 @@ class RestRoute extends AbstractRoute
                     $action = 'create';
 
                     // clone existing
-                    $clone = $request->getParameter('clone');
-                    if (!!$clone) {
+                    if (!!array_key_exists('clone', $request)) {
                         $action = 'clone';
-                        $params['id'] = $clone;
+                        $request['id'] = $request['clone'];
+                        unset($request['clone']);
                     }
 
                     $data = json_decode(file_get_contents('php://input'), TRUE);
@@ -51,31 +51,29 @@ class RestRoute extends AbstractRoute
                 case 'OPTIONS':
                     header('Access-Control-Allow-Origin: *');
                     header('Access-Control-Allow-Headers: ' . join(',', [
-                        'Content-Type',
-                        'Authorization'
-                    ]));
+                            'Content-Type',
+                            'Authorization'
+                        ]));
                     header('Access-Control-Allow-Methods:' . join(',', [
-                        'GET',
-                        'POST',
-                        'PUT',
-                        'DELETE'
-                    ]));
+                            'GET',
+                            'POST',
+                            'PUT',
+                            'DELETE'
+                        ]));
                     exit;
 
                     break;
             }
 
-            $params['action'] = 'rest' . ucfirst(strtolower($action));
+            $request['action'] = 'rest' . ucfirst(strtolower($action));
 
             if (empty($data))
                 $data = [];
 
-            $params['data'] = isset($data['request_data']) ? $data['request_data'] : $data;
+            $request['data'] = isset($data['request_data']) ? $data['request_data'] : $data;
 
             // filter only valid keys
-            $params = array_intersect_key($params, array_flip([ 'module', 'controller', 'action', 'id', 'data' ]));
-
-            $request->setParameters($params);
+            $request = array_intersect_key($request, array_flip([ 'module', 'presenter', 'action', 'id', 'data' ]));
         }
 
         return $request;

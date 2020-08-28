@@ -11,7 +11,7 @@ use Varhall\Restino\Utils\FileUtils;
  */
 class FilesRoute extends AbstractRoute
 {
-    public function match(\Nette\Http\IRequest $httpRequest)
+    public function match(\Nette\Http\IRequest $httpRequest): ?array
     {
         $request = parent::match($httpRequest);
 

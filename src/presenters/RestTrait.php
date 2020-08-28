@@ -16,9 +16,9 @@ trait RestTrait
      * Is AJAX request?
      * @return bool
      */
-    public function isAjax()
+    public function isAjax(): bool
     {
-        return TRUE;
+        return true;
     }
 
     /**
