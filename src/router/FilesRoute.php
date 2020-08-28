@@ -15,11 +15,8 @@ class FilesRoute extends AbstractRoute
     {
         $request = parent::match($httpRequest);
 
-        if ($request != NULL) {
+        if (!!$request) {
             $action = 'default';
-
-            // if ($httpRequest->getMethod() != 'POST' && !$request->getParameter('id'))
-            //     throw new \Nette\InvalidArgumentException('Missing or invalid parameter ID');
 
             $files = NULL;
             $data = [];
@@ -46,8 +43,8 @@ class FilesRoute extends AbstractRoute
                         ? array_values($httpRequest->getFiles())
                         : FileUtils::retrieveFiles($content, 'files');
 
-                    $data = !empty($request->getPost())
-                        ? $request->getPost()
+                    $data = !empty($httpRequest->getPost())
+                        ? $httpRequest->getPost()
                         : isset($content['data']) ? $content['data'] : [];
 
                     break;
@@ -61,15 +58,11 @@ class FilesRoute extends AbstractRoute
                     break;
             }
 
-            $params = $request->getParameters();
-
-            $params['action'] = strtolower($action);
-            $params['data'] = $data;
+            $request['action'] = strtolower($action);
+            $request['data'] = $data;
 
             if ($files)
-                $params['files'] = $files;
-
-            $request->setParameters($params);
+                $request['files'] = $files;
         }
 
         return $request;
