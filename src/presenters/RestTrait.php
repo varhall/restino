@@ -3,6 +3,7 @@
 namespace Varhall\Restino\Presenters;
 
 use Varhall\Restino\Utils\FileUtils;
+use Varhall\Utilino\Collections\ICollection;
 
 
 /**
@@ -73,5 +74,33 @@ trait RestTrait
     {
         $data = $this->getParameter('data', []);
         return FileUtils::retrieveFiles($data, $key);
+    }
+
+    /**
+     * Expands object with nested subobject properties
+     *
+     * @param $object Object to be expanded
+     * @param $path Properties in format "property.nested.subnested"
+     * @return ICollection
+     */
+    public function expand($object, $path)
+    {
+        if (empty($path))
+            return $object;
+
+        if ($object instanceof ICollection) {
+            return $object->map(function ($item) use ($path) {
+                return $this->expand($item, $path);
+            });
+        }
+
+        $path = explode('.', $path);
+        $property = array_shift($path);
+        $path = implode('.', $path);
+
+        $result = $object->toArray();
+        $result[$property] = $this->expand($object->$property, $path);
+
+        return $result;
     }
 }
