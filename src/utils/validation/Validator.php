@@ -95,24 +95,36 @@ class Validator implements IConfigured
 
     protected function validateProperty($property, array $data, $rules)
     {
-        // prepend required
-        foreach ($rules as $rule) {
-            if ($rule instanceof Required) {
-                array_unshift($rules, $rule);
-                break;
-            }
-        }
+        // validate required if not present
+        if (!array_key_exists($property, $data) || $data[$property] === null)
+            return $this->validateRequired($property, $data, $rules);
 
-        // validate
+        // validate rules
         foreach ($rules as $rule) {
+            if ($rule instanceof Required)
+                continue;
+
             $rule->property = $property;
             $rule->data = $data;
 
-            $value = array_key_exists($property, $data) ? $data[$property] : null;
-            $result = $rule->valid($value);
+            $result = $rule->valid($data[$property]);
 
-            if ($result !== true && $result !== null)
-                return [ 'message' => $result, 'type' => (new \ReflectionClass($rule))->getShortName() ];
+            if (is_string($result))
+                $result = new Error($result);
+
+            if ($result instanceof Error)
+                return $result->setSource($rule);
+        }
+
+        return null;
+    }
+
+    protected function validateRequired($property, array $data, $rules)
+    {
+        foreach ($rules as $rule) {
+            if ($rule instanceof Required) {
+                return (new Error($rule->valid(false)))->setSource($rule);
+            }
         }
 
         return null;

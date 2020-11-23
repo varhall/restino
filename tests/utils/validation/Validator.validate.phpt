@@ -4,6 +4,7 @@ use Tester\Assert;
 use Tester\Expect;
 use \Varhall\Restino\Utils\Validation\Validator;
 use \Varhall\Restino\Utils\Validation\Rules\Enum;
+use \Varhall\Restino\Utils\Validation\Error;
 
 require __DIR__ . '/../../bootstrap.php';
 
@@ -15,10 +16,14 @@ function simpleAssert($value, $rule, $expectedType = null) {
     $data  = !is_array($value) ? [ 'foo'   => $value ] : $value;
     $rules = [ 'foo'   => $rule ];
 
-    if ($expectedType !== null)
-        Assert::equal([ 'foo' => [ 'type' => $expectedType, 'message' => Expect::type('string') ] ], runTest($data, $rules));
-    else
+    $result = runTest($data, $rules);
+
+    if ($expectedType !== null) {
+        Assert::equal(['foo' => Expect::type(Error::class)], $result);
+        Assert::equal($expectedType, $result['foo']->getType());
+    } else {
         Assert::equal([], runTest($data, $rules));
+    }
 }
 
 
@@ -37,8 +42,8 @@ test('Complex', function() {
     ];
 
     Assert::equal([
-        'baz'   => [ 'type' => 'Enum', 'message' => Expect::type('string') ],
-        'qux'   => [ 'type' => 'Required', 'message' => Expect::type('string') ],
+        'baz'   => Expect::type(Error::class),
+        'qux'   => Expect::type(Error::class),
     ], runTest($data, $rules));
 });
 
@@ -56,9 +61,15 @@ test('Multiple', function() {
 test('Required', function() {
     simpleAssert('test', 'required');
     simpleAssert(false, 'required');
+    simpleAssert('', 'required');
 
-    simpleAssert('', 'required', 'Required');
     simpleAssert(null, 'required', 'Required');
+});
+
+test('Empty optional', function() {
+    simpleAssert(null, 'bool');
+    simpleAssert(null, 'string');
+    simpleAssert(null, 'array');
 });
 
 test('Date', function() {
