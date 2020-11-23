@@ -109,7 +109,7 @@ class Json implements IResult
         if ($this->serializer && is_callable($this->serializer))
             return call_user_func($this->serializer, $data);
 
-        else if (is_array($data) || is_scalar($data) || is_null($data))
+        else if (is_scalar($data) || is_null($data))
             return $data;
 
         else if ($data instanceof \Varhall\Utilino\ISerializable)
@@ -120,6 +120,9 @@ class Json implements IResult
 
         else if ($data instanceof \Nette\Database\Table\ActiveRow)
             return $data->toArray();
+
+        else if (is_array($data))
+            return array_map(function($item) { return $this->toSendable($item); }, $data);
 
         else if (is_object($data))
             return json_decode(json_encode($data), true);

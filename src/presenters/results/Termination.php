@@ -2,7 +2,6 @@
 
 namespace Varhall\Restino\Presenters\Results;
 
-use Nette\Application\Responses\JsonResponse;
 use Nette\Http\Response;
 use Varhall\Restino\Presenters\RestRequest;
 
@@ -25,10 +24,10 @@ class Termination implements IResult
     
     public function run(RestRequest $request)
     {
-        if ($this->code < 300)
-            return (new Json($this->response))->run($request);
+        if ($this->code >= 300)
+            $request->getPresenter()->getHttpResponse()->setCode($this->code);
 
-        $request->getPresenter()->getHttpResponse()->setCode($this->code);
-        return new JsonResponse(is_array($this->response) ? $this->response : [ 'message' => $this->response ]);
+        $response = is_scalar($this->response) ? [ 'message' => $this->response ] : $this->response;
+        return (new Json($response))->run($request);
     }
 }
