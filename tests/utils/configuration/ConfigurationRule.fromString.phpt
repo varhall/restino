@@ -42,20 +42,3 @@ test('', function() {
     Assert::null($result->arguments);
     Assert::equal([], $result->modifiers);
 });
-
-
-// allowed
-
-test('', function() {
-    $result = runTest('string:only=create');
-
-    Assert::true($result->allowed('create'));
-    Assert::false($result->allowed('update'));
-});
-
-test('', function() {
-    $result = runTest('string');
-
-    Assert::true($result->allowed('create'));
-    Assert::true($result->allowed('update'));
-});

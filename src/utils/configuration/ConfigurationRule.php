@@ -40,6 +40,14 @@ class ConfigurationRule
 
     public function allowed($method)
     {
-        return empty($this->modifiers) || in_array($method, $this->modifiers);
+        if (!array_key_exists('only', $this->modifiers))
+            return true;
+
+        $only = $this->modifiers['only'];
+
+        if (is_string($only))
+            $only = array_map('trim', explode(',', $only));
+
+        return in_array($method, $only);
     }
 }

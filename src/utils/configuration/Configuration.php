@@ -12,9 +12,9 @@ class Configuration
                 $propRules = $propRules[$section];
 
             $propRules = array_map(function($rule) use ($source) { return $source->createRule($rule); }, !is_array($propRules) ? [ $propRules ] : $propRules);
-            $propRules = array_filter($propRules, function($rule) use ($section) { return $rule->allowed($section); });
+            $propRules = array_filter($propRules, function($rule) use ($section) { return !$section || $rule->allowed($section); });
 
-            $rules[$property] = $propRules;
+            $rules[$property] = array_values($propRules);
         }
 
         return $rules;
