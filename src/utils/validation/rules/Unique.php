@@ -4,9 +4,9 @@ namespace Varhall\Restino\Utils\Validation\Rules;
 
 class Unique extends Rule
 {
-    public static function create($class)
+    public static function create($class, $modifiers = [])
     {
-        return new Unique('unique', $class);
+        return new Unique('unique', $class, $modifiers);
     }
 
     public function valid($value)
