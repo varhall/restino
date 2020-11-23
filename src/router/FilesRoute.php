@@ -45,7 +45,7 @@ class FilesRoute extends AbstractRoute
 
                     $data = !empty($httpRequest->getPost())
                         ? $httpRequest->getPost()
-                        : isset($content['data']) ? $content['data'] : [];
+                        : (isset($content['data']) ? $content['data'] : []);
 
                     break;
 

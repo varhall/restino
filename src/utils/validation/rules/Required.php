@@ -2,15 +2,11 @@
 
 namespace Varhall\Restino\Utils\Validation\Rules;
 
-/**
- * Description of Required
- *
- * @author sibrava
- */
-class Required implements IRule
+class Required extends Rule
 {
-    public function apply($value, $args)
+    public function valid($value)
     {
-        
+        if (empty($value) && $value !== false)
+            return 'Field is required';
     }
 }

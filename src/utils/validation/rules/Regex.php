@@ -2,15 +2,15 @@
 
 namespace Varhall\Restino\Utils\Validation\Rules;
 
-/**
- * Description of Regex
- *
- * @author sibrava
- */
-class Regex implements IRule
+class Regex extends Rule
 {
-    public function apply($value, $args)
+    public function valid($value)
     {
-        \Nette\Utils\Validators::assert($value, 'pattern:' . $args);
+        try {
+            \Nette\Utils\Validators::assert($value, "pattern:{$this->arguments}");
+
+        } catch (\Nette\Utils\AssertionException $ex) {
+            return $ex->getMessage();
+        }
     }
 }

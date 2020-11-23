@@ -2,12 +2,8 @@
 
 namespace Varhall\Restino\Utils\Transformation\Transformators;
 
-/**
- * Description of Lowercase
- *
- * @author sibrava
- */
-class Lowercase implements ITransformator
+
+class Lowercase extends Rule
 {
     public function apply($value)
     {

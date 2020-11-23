@@ -2,18 +2,25 @@
 
 namespace Varhall\Restino\Utils\Validation\Rules;
 
-/**
- * Description of Enum
- *
- * @author sibrava
- */
-class Enum implements IRule
+
+class Enum extends Rule
 {
-    public function apply($value, $args)
+    public static function create($args, $modifiers = [])
     {
-        $enum = array_map('trim', explode(',', $args));
-        
-        if (!in_array($value, $enum))
-            throw new \Nette\Utils\AssertionException('Field not match enum [' . $args . ']');
+        return new static('enum', $args, $modifiers);
+    }
+
+    public function valid($value)
+    {
+        if (is_string($this->arguments))
+            $this->arguments = array_map('trim', explode(',', $this->arguments));
+
+        if (!is_array($this->arguments))
+            return 'Enum is not valid array';
+
+        if (!in_array($value, $this->arguments))
+            return 'Field not match enum [' . implode(', ', $this->arguments) . ']';
+
+        return true;
     }
 }

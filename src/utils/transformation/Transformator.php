@@ -2,90 +2,89 @@
 
 namespace Varhall\Restino\Utils\Transformation;
 
-use Varhall\Restino\Utils\Configuration;
+use Varhall\Restino\Utils\Configuration\Configuration;
+use Varhall\Restino\Utils\Configuration\ConfigurationRule;
+use Varhall\Restino\Utils\Configuration\IConfigured;
+use Varhall\Restino\Utils\Transformation\Transformators\Nothing;
+use Varhall\Restino\Utils\Transformation\Transformators\Rule;
 
-/**
- * Description of Transformator
- *
- * @author sibrava
- */
-class Transformator
+class Transformator implements IConfigured
 {
-    private static $instance = NULL;
+    protected $transformators = null;
 
-    private $transformators = NULL;
+    protected $defaults       = [ 'trim', 'number', 'date' ];
 
-    private $defaults       = [ 'trim', 'number', 'date' ];
-
-    // singleton factory method
-    public static function __callStatic($name, $arguments)
+    public static function instance()
     {
-        if (!self::$instance)
-            self::$instance = new static();
-
-        return call_user_func_array([self::$instance, $name], $arguments);
+        return new static();
     }
 
-    private function __construct()
+    public function __construct()
     {
         $this->transformators = [
-            'trim'          => new Transformators\Trim(),
-            'uppercase'     => new Transformators\Uppercase(),
-            'lowercase'     => new Transformators\Lowercase(),
-            'upperfirst'    => new Transformators\Upperfirst(),
+            'trim'          => Transformators\Trim::class,
+            'uppercase'     => Transformators\Uppercase::class,
+            'lowercase'     => Transformators\Lowercase::class,
+            'upperfirst'    => Transformators\Upperfirst::class,
 
-            'number'        => new Transformators\Number(),
-            'int'           => new Transformators\Number(),
-            'integer'       => new Transformators\Number(),
-            'double'        => new Transformators\Number(),
-            'float'         => new Transformators\Number(),
+            'number'        => Transformators\Number::class,
+            'int'           => Transformators\Number::class,
+            'integer'       => Transformators\Number::class,
+            'double'        => Transformators\Number::class,
+            'float'         => Transformators\Number::class,
 
-            'bool'          => new Transformators\Boolean(),
-            'boolean'       => new Transformators\Boolean(),
+            'bool'          => Transformators\Boolean::class,
+            'boolean'       => Transformators\Boolean::class,
 
-            'date'          => new Transformators\Date(),
-            'datetime'      => new Transformators\Date(),
+            'date'          => Transformators\Date::class,
+            'datetime'      => Transformators\Date::class,
         ];
     }
 
-
-    /////////////////////////// Fictive static methods //////////////////////////////
-
-    private function addTransformator($name, Transformators\ITransformator $transformate)
+    public function defaults()
     {
-        $this->transformators[$name] = $transformate;
-    }
-
-    private function defaults()
-    {
-        return [ 'trim' ];
+        return [ $this->createRule('trim') ];
     }
 
     //////////////////////////////// Transformation ////////////////////////////////
 
-    private function transformate(array $data, array $rules, $section = NULL)
+    public function transformate(array $data, array $rules, $section = null)
     {
-        if (!empty($section))
-            $rules = Configuration::extractSection($rules, $section);
+        $configuration = $this->configuration($rules, $section);
 
-        return $this->transformateData($data, $rules);
-    }
-
-    private function transformateData(array $data, array $rules)
-    {
         foreach ($data as $key => $value) {
-            $rule = isset($rules[$key]) ? $rules[$key] : $this->defaults();
+            $rule = isset($configuration[$key]) ? $configuration[$key] : $this->defaults();
 
             $data[$key] = $this->transformField($value, $rule);
         }
+
         return $data;
+    }
+
+    public function configuration($rules, $section)
+    {
+        return Configuration::create($rules, $section, $this);
+    }
+
+    public function createRule($rule)
+    {
+        if ($rule instanceof Rule)
+            return $rule;
+
+        if ($rule instanceof \Varhall\Restino\Utils\Validation\Rules\Rule)
+            return $rule->toTransformationRule();
+
+        if (is_string($rule))
+            $rule = ConfigurationRule::fromString($rule);
+
+        $class = isset($this->transformators[$rule->name]) ? $this->transformators[$rule->name] : Nothing::class;
+        return $class::fromRule($rule);
     }
 
     private function transformField($value, array $rules)
     {
         foreach ($rules as $rule) {
-            if (isset($this->transformators[$rule]))
-                $value = $this->transformators[$rule]->apply($value);
+            $value = $rule->apply($value);
         }
 
         return $value;

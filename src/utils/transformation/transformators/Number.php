@@ -2,12 +2,8 @@
 
 namespace Varhall\Restino\Utils\Transformation\Transformators;
 
-/**
- * Description of Number
- *
- * @author sibrava
- */
-class Number implements ITransformator
+
+class Number extends Rule
 {
     public function apply($value)
     {

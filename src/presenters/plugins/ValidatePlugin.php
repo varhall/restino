@@ -14,7 +14,7 @@ class ValidatePlugin extends Plugin
 {
     protected function handle(RestRequest $request, ...$args)
     {
-        $errors = Validator::validate($request->data, $this->presenterCall($request->getPresenter(), 'validationDefinition'), $request->method);
+        $errors = Validator::instance()->validate($request->data, $this->presenterCall($request->getPresenter(), 'validationDefinition'), $request->method);
 
         if (count($errors) > 0)
             return $this->terminate(['errors' => $errors], \Nette\Http\Response::S400_BAD_REQUEST);

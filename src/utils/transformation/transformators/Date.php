@@ -2,12 +2,8 @@
 
 namespace Varhall\Restino\Utils\Transformation\Transformators;
 
-/**
- * Description of Date
- *
- * @author sibrava
- */
-class Date implements ITransformator
+
+class Date extends Rule
 {
     private $patterns = [
         '^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(([+\-]\d{2}:\d{2})|Z)?)?$'

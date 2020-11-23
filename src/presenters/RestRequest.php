@@ -6,11 +6,11 @@ use Nette\Application\UI\Presenter;
 
 class RestRequest
 {
-    private $plugins = [];
+    protected $plugins = [];
 
-    private $current = 0;
+    protected $current = 0;
 
-    private $presenter = NULL;
+    protected $presenter = NULL;
 
     public $data = [];
 

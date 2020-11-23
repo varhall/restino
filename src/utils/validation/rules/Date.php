@@ -2,20 +2,24 @@
 
 namespace Varhall\Restino\Utils\Validation\Rules;
 
-/**
- * Description of Date
- *
- * @author sibrava
- */
-class Date implements IRule
+class Date extends Rule
 {
-    public function apply($value, $args)
+    public function toTransformationRule()
     {
+        return \Varhall\Restino\Utils\Transformation\Transformators\Date::fromRule($this);
+    }
+
+    public function valid($value)
+    {
+        if ($value instanceof \DateTime)
+            return true;
+
         try {
             \Nette\Utils\DateTime::from(strtotime($value));
-            
+            return true;
+
         } catch (\Exception $ex) {
-            throw new \Nette\Utils\AssertionException('Value ' . $value . ' is not correct date');
+            return "Value {$value} is not correct date";
         }
     }
 }

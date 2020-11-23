@@ -2,12 +2,8 @@
 
 namespace Varhall\Restino\Utils\Transformation\Transformators;
 
-/**
- * Description of Text
- *
- * @author sibrava
- */
-class Trim implements ITransformator
+
+class Trim extends Rule
 {
     public function apply($value)
     {

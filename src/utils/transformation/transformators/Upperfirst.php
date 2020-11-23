@@ -2,12 +2,8 @@
 
 namespace Varhall\Restino\Utils\Transformation\Transformators;
 
-/**
- * Description of Upperfirst
- *
- * @author sibrava
- */
-class Upperfirst implements ITransformator
+
+class Upperfirst extends Rule
 {
     public function apply($value)
     {

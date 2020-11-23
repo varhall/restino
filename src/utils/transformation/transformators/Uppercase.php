@@ -2,12 +2,8 @@
 
 namespace Varhall\Restino\Utils\Transformation\Transformators;
 
-/**
- * Description of Uppercase
- *
- * @author sibrava
- */
-class Uppercase implements ITransformator
+
+class Uppercase extends Rule
 {
     public function apply($value)
     {
