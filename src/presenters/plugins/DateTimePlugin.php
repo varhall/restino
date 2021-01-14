@@ -11,7 +11,7 @@ class DateTimePlugin extends Plugin
 
     protected function handle(RestRequest $request, ...$args)
     {
-        $timezone = $this->getTimezone($request->getPresenter()->context);
+        $timezone = $this->getTimezone(@$request->getPresenter()->context);
 
         $this->normalizeDates($request->data, $timezone);
 
