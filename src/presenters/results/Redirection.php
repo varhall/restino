@@ -11,10 +11,10 @@ use Varhall\Restino\Presenters\RestRequest;
  */
 class Redirection implements IResult
 {
-    public $destination = NULL;
+    public $destination = null;
     
-    public $args        = NULL;
-    
+    public $args        = null;
+
     public function __construct($response, $args)
     {
         $this->response = $response;
