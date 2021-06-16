@@ -12,8 +12,6 @@ class Transformator implements IConfigured
 {
     protected $transformators = null;
 
-    protected $defaults       = [ 'trim', 'number', 'date' ];
-
     public static function instance()
     {
         return new static();
@@ -22,6 +20,9 @@ class Transformator implements IConfigured
     public function __construct()
     {
         $this->transformators = [
+            'null'          => Transformators\Nil::class,
+            'nil'           => Transformators\Nil::class,
+
             'trim'          => Transformators\Trim::class,
             'uppercase'     => Transformators\Uppercase::class,
             'lowercase'     => Transformators\Lowercase::class,
@@ -43,7 +44,7 @@ class Transformator implements IConfigured
 
     public function defaults()
     {
-        return [ $this->createRule('trim') ];
+        return [ $this->createRule('null'), $this->createRule('trim') ];
     }
 
     //////////////////////////////// Transformation ////////////////////////////////
