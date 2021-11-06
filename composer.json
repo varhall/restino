@@ -1,28 +1,28 @@
 {
 	"name": "varhall/restino",
 	"type": "library",
-	"description": "Varhall REST API layer",
+	"description": "Nette REST API Library",
 	"keywords": ["nette", "rest", "api"],
-	"homepage": "https://gitlab.com/varhallpub/restino",
+	"homepage": "https://github.com/varhall/restino",
 	"license": "MIT",
         "authors": [
 		{
 			"name": "Ondrej Sibrava",
-			"homepage": "http://www.varhall.cz"
+			"homepage": "https://www.varhall.cz"
 		}
 	],
 	"support": {
-		"issues": "https://gitlab.com/varhallpub/restino"
+		"issues": "https://github.com/varhall/restino"
 	},
 
 	"require": {
-		"php": ">=7.2.0",
-		"nette/utils": ">=3.0",
+		"php": ">=7.4",
+		"nette/utils": ">=v3.2.0",
 		"nette/di": ">=3.0",
-		"nette/application": ">=3.0",
+		"nette/application": ">=v3.1",
 		"nette/http": ">=3.0",
 		"nette/security": ">=3.0",
-		"varhall/utilino": "dev-nette-30"
+		"varhall/utilino": ">=1.1"
 	},
 
 	"require-dev": {
