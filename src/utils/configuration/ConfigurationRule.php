@@ -19,7 +19,8 @@ class ConfigurationRule
     public static function fromString($string)
     {
         $modifiers = array_filter([
-            'only' => Configuration::getParameter($string, 'only')
+            'only' => Configuration::getParameter($string, 'only'),
+            'except' => Configuration::getParameter($string, 'except')
         ]);
 
         foreach (array_keys($modifiers) as $option) {
@@ -40,14 +41,22 @@ class ConfigurationRule
 
     public function allowed($method)
     {
-        if (!array_key_exists('only', $this->modifiers))
-            return true;
+        if (array_key_exists('only', $this->modifiers))
+            return $this->allowedType($method, 'only');
 
-        $only = $this->modifiers['only'];
+        if (array_key_exists('except', $this->modifiers))
+            return !$this->allowedType($method, 'except');
 
-        if (is_string($only))
-            $only = array_map('trim', explode(',', $only));
+        return true;
+    }
 
-        return in_array($method, $only);
+    protected function allowedType($method, $type)
+    {
+        $allowed = $this->modifiers[$type];
+
+        if (is_string($allowed))
+            $allowed = array_map('trim', explode(',', $allowed));
+
+        return in_array($method, $allowed);
     }
 }
