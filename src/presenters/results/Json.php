@@ -182,7 +182,7 @@ class Json implements IResult
      */
     protected function expandResponse($response, $source)
     {
-        $query = array_map('trim', explode(',', $this->getQueryArgument('expand')));
+        $query = array_map('trim', explode(',', $this->getQueryArgument('expand') ?? ''));
         $expandFields = array_merge((array) $this->expand, $query);
 
         $definitions = $this->expandDefinition();
