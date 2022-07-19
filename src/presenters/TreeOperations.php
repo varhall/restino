@@ -3,6 +3,8 @@
 namespace Varhall\Restino\Presenters;
 
 
+use Varhall\Utilino\Utils\Reflection;
+
 trait TreeOperations
 {
     public function restList(array $data = [])
@@ -38,10 +40,11 @@ trait TreeOperations
     protected function treeColumns()
     {
         $class = $this->modelClass();
+        $instance = $class::instance();
 
         return (object) array_merge(
-            (array) $class::treeColumnsConfig(),
-            [ 'id'  => $class::identifier() ]
+            (array) Reflection::callPrivateMethod($instance, 'treeColumns'),
+            [ 'id'  => $class::all()->getPrimary() ]
         );
     }
 
