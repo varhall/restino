@@ -2,37 +2,44 @@
 
 namespace Varhall\Restino\Presenters;
 
+use Nette\Application\Request;
 use Nette\Application\UI\Presenter;
+use Nette\InvalidStateException;
 
 class RestRequest
 {
+    /** @var array */
     protected $plugins = [];
 
-    protected $current = 0;
+    /** @var Presenter */
+    protected $presenter;
 
-    protected $presenter = NULL;
-
+    /** @var array */
     public $data = [];
 
-    public $id = NULL;
+    /** @var mixed */
+    public $id;
 
-    public $method = NULL;
+    /** @var string */
+    public $method;
+
 
     public function __construct(array $plugins, Presenter $presenter)
     {
+        $request = $presenter->getRequest();
+
+        $this->data = $request->getParameter('data', []);
+        $this->id = $request->getParameter('id');
+        $this->method = $this->getMethod($request);
+
         $this->presenter = $presenter;
-
-        $this->plugins = array_values(array_filter($plugins, function($item) use ($presenter) { return $item->canRun($presenter->getMethod()); }));
-
-        $this->data = $presenter->getRequest()->getParameter('data', []);
-        $this->id = $presenter->getRequest()->getParameter('id');
-        $this->method = $presenter->getMethod();
+        $this->plugins = array_filter($plugins, fn($item) => $item->canRun($this->method));
     }
 
     /**
      * @return Presenter
      */
-    public function getPresenter()
+    public function getPresenter(): Presenter
     {
         return $this->presenter;
     }
@@ -57,6 +64,21 @@ class RestRequest
         }
     }
 
+
+    /// PRIVATE FUNCTIONS
+
+    protected function getMethod(Request $request): string
+    {
+        $action = strtolower($request->getParameter('action'));
+
+        if (!$action || !preg_match('/^rest/', $action)) {
+            throw new InvalidStateException('Invalid method name');
+        }
+
+        return preg_replace('/^rest/', '', $action);
+    }
+
+    /** @deprecated */
     private function hasNext()
     {
         return $this->current < count($this->plugins);

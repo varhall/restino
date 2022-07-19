@@ -19,58 +19,37 @@ trait RestPresenter
     protected $plugins = [];
 
 
-    public function getMethod()
-    {
-        $action = strtolower($this->getAction());
-        if (!preg_match('/^rest/', $action))
-            throw new InvalidStateException('Invalid method name');
-
-        return preg_replace('/^rest/', '', $action);
-    }
-
 
     /// NETTE ACTIONS
 
     public function renderRestList(array $data = [])
     {
-        $result = $this->runRestMethod();
-
-        $this->sendJson($result);
+        $this->sendResponse($this->runRestMethod());
     }
 
     public function renderRestGet($id, array $data = [])
     {
-        $result = $this->runRestMethod();
-
-        $this->sendJson($result);
+        $this->sendResponse($this->runRestMethod());
     }
 
     public function renderRestCreate(array $data)
     {
-        $result = $this->runRestMethod();
-
-        $this->sendJson($result);
+        $this->sendResponse($this->runRestMethod());
     }
 
     public function renderRestUpdate($id, array $data)
     {
-        $result = $this->runRestMethod();
-
-        $this->sendJson($result);
+        $this->sendResponse($this->runRestMethod());
     }
 
     public function renderRestDelete($id, array $data = [])
     {
-        $result = $this->runRestMethod();
-
-        $this->sendJson($result);
+        $this->sendResponse($this->runRestMethod());
     }
 
     public function renderRestClone($id, array $data)
     {
-        $result = $this->runRestMethod();
-
-        $this->sendJson($result);
+        $this->sendResponse($this->runRestMethod());
     }
 
 
