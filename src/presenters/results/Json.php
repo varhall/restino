@@ -271,7 +271,15 @@ class Json implements IResult
         $parameters = $this->getFilterParameters($data);
 
         // check valid columns
-        $validColumns = method_exists($data, 'columns') ? $data->columns() : null;
+        $validColumns = null;
+        if (method_exists($this->request->getPresenter(), 'modelClass')) {
+            $r = new \ReflectionMethod(get_class($this->request->getPresenter()), 'modelClass');
+            $r->setAccessible(true);
+            $model = $r->invokeArgs($this->request->getPresenter(), []);
+
+            $validColumns = $model::columns();
+        }
+
         $parameters = array_values(array_filter($parameters, function($parameter) use ($validColumns) {
             return $validColumns === null || in_array($parameter['field'], $validColumns);
         }));
