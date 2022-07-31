@@ -2,57 +2,44 @@
 
 namespace Varhall\Restino\Presenters\Plugins;
 
+use Nette\NotImplementedException;
+
 class PluginConfiguration
 {
-    protected $plugins = NULL;
+    protected $action;
 
-    protected $action = NULL;
-
+    /** @var array */
     protected $args = [];
 
+    /** @var array */
     protected $only = [];
 
+    /** @var array */
     protected $except = [];
 
-    public function __construct(array &$plugins, $action)
+    public function __construct($action)
     {
-        $this->plugins = &$plugins;
         $this->action = $action;
     }
 
-    public static function find($search, array $plugins)
-    {
-        foreach ($plugins as $plugin) {
-            if ($plugin->action === $search)
-                return $plugin;
-        }
-
-        return NULL;
-    }
-
-    public static function findIndex($search, array $plugins)
-    {
-        return array_search(static::find($search, $plugins), $plugins);
-    }
-
-    public function canRun($method)
+    public function canRun(string $method): bool
     {
         if (!empty($this->only) && !in_array($method, $this->only))
-            return FALSE;
+            return false;
 
         if (!empty($this->except) && in_array($method, $this->except))
-            return FALSE;
+            return false;
 
-        return TRUE;
+        return true;
     }
 
-    public function createPlugin()
+    public function createPlugin(): Plugin
     {
         if (is_object($this->action) && $this->action instanceof Plugin)
             return $this->action;
 
         else if (is_string($this->action) && class_exists($this->action))
-            return new $this->action();
+            return new $this->action(...$this->args);
 
         else if (is_callable($this->action))
             return new ClosurePlugin($this->action);
@@ -60,21 +47,21 @@ class PluginConfiguration
         throw new \InvalidArgumentException('Cannot create plugin');
     }
 
-    public function only($methods)
+    public function only(string|array $methods): self
     {
         $this->only = array_unique(array_merge($this->only, (array) $methods));
 
         return $this;
     }
 
-    public function except($methods)
+    public function except(string|array $methods): self
     {
         $this->except = array_unique(array_merge($this->except, (array) $methods));
 
         return $this;
     }
 
-    public function reset()
+    public function reset(): self
     {
         $this->only = [];
         $this->except = [];
@@ -84,6 +71,8 @@ class PluginConfiguration
 
     public function disable()
     {
+        throw new NotImplementedException('not implemented yet');
+
         $index = array_search($this, $this->plugins);
 
         if ($index === FALSE)
@@ -96,6 +85,8 @@ class PluginConfiguration
 
     public function moveAfter($after = NULL)
     {
+        throw new NotImplementedException('not implemented yet');
+
         if (!!$after && !self::find($after, $this->plugins))
             throw new InvalidArgumentException("Plugin '{$after}' not found");
 
@@ -110,6 +101,8 @@ class PluginConfiguration
 
     public function moveBefore($before = NULL)
     {
+        throw new NotImplementedException('not implemented yet');
+
         if (!!$before && !self::find($before, $this->plugins))
             throw new InvalidArgumentException("Plugin '{$before}' not found");
 
@@ -122,14 +115,14 @@ class PluginConfiguration
         return $this;
     }
 
-    public function args(...$args)
+    public function args(...$args): self
     {
         $this->args = $args;
 
         return $this;
     }
 
-    public function getArgs()
+    public function getArgs(): array
     {
         return $this->args;
     }

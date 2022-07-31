@@ -2,39 +2,25 @@
 
 namespace Varhall\Restino\Presenters\Plugins;
 
-use Nette\Application\UI\Presenter;
 use Varhall\Restino\Presenters\RestRequest;
 use Varhall\Restino\Presenters\Results\Redirection;
 use Varhall\Restino\Presenters\Results\Termination;
 
-/**
- * Abstract presenter plugin. Plugin is called during request process and transforms
- * the request.
- *
- * @author Ondrej Sibrava <sibrava@varhall.cz>
- */
 abstract class Plugin
 {
-    public function run(RestRequest $request, ...$args)
-    {
-        if (method_exists($this, 'handle'))
-            return call_user_func_array([ $this, 'handle' ], array_merge([ $request ], $args));
-
-        return $request->next();
-    }
-
-    //protected abstract function handle(RestRequest $request, ...$args);
+    public abstract function __invoke(RestRequest $request, callable $next): mixed;
 
     protected function terminate($response, $code = 500)
     {
         return new Termination($response, $code);
     }
 
-    protected function redirect($destination, $args = NULL)
+    protected function redirect($destination, $args = null)
     {
         return new Redirection($destination, $args);
     }
 
+    /*
     protected function checkPresenterRequirements(Presenter $presenter)
     {
         $classes = array_merge([get_class($presenter)], class_parents($presenter));
@@ -52,5 +38,5 @@ abstract class Plugin
         $r = new \ReflectionMethod(get_class($presenter), $method);
         $r->setAccessible(TRUE);
         return $r->invokeArgs($presenter, $args);
-    }
+    }*/
 }

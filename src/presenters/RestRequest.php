@@ -2,9 +2,8 @@
 
 namespace Varhall\Restino\Presenters;
 
-use Nette\Application\Request;
 use Nette\Application\UI\Presenter;
-use Nette\InvalidStateException;
+use Varhall\Restino\Presenters\Results\IResult;
 
 class RestRequest
 {
@@ -24,7 +23,7 @@ class RestRequest
     public $method;
 
 
-    public function __construct(array $plugins, Presenter $presenter)
+    public function __construct(Presenter $presenter)
     {
         $request = $presenter->getRequest();
 
@@ -33,17 +32,59 @@ class RestRequest
         $this->method = $this->getMethod($request);
 
         $this->presenter = $presenter;
-        $this->plugins = array_filter($plugins, fn($item) => $item->canRun($this->method));
+        //$this->plugins = array_filter($plugins, fn($item) => $item->canRun($this->method));
     }
 
-    /**
-     * @return Presenter
-     */
     public function getPresenter(): Presenter
     {
         return $this->presenter;
     }
 
+    public function run(): IResult
+    {
+        $action = fn(RestRequest $request): mixed => $this->runRestMethod();
+
+        foreach ($this->plugins as $plugin) {
+            $action = fn(RestRequest $request): mixed => $plugin($request, $action);
+        }
+
+        $result = $action($this);
+
+        if (!($result instanceof IResult)) {
+            $result = new Json($result);
+        }
+
+        return $result;
+    }
+
+    public function &getPlugins(): array
+    {
+        return $this->plugins;
+    }
+
+    public function hasPlugin(string $class): bool
+    {
+        foreach ($this->plugins as $plugin) {
+            if ($plugin instanceof $class) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function runRestMethod(): mixed
+    {
+        $args = array_filter([ $this->id, $this->data ], function($item) {
+            return is_array($item) || !!$item;
+        });
+
+        $method = 'rest' . ucfirst($this->method);
+        return call_user_func_array([ $this->presenter, $method ], $args);
+    }
+
+
+    /*
     public function next()
     {
         if ($this->hasNext()) {
@@ -78,9 +119,9 @@ class RestRequest
         return preg_replace('/^rest/', '', $action);
     }
 
-    /** @deprecated */
     private function hasNext()
     {
         return $this->current < count($this->plugins);
     }
+    */
 }

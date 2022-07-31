@@ -2,10 +2,12 @@
 
 namespace Varhall\Restino\Presenters;
 
+use Nette\Http\Response;
 use Nette\InvalidStateException;
 use Varhall\Restino\Presenters\Plugins\PluginConfiguration;
 use Varhall\Restino\Presenters\Results\IResult;
 use Varhall\Restino\Presenters\Results\Json;
+use Varhall\Restino\Presenters\Results\Termination;
 
 /**
  * Zakladni presenter pro administracni modul
@@ -16,7 +18,8 @@ trait RestPresenter
 {
     use RestTrait;
 
-    protected $plugins = [];
+    /** @var RestRequest */
+    private $restRequest;
 
 
 
@@ -24,32 +27,32 @@ trait RestPresenter
 
     public function renderRestList(array $data = [])
     {
-        $this->sendResponse($this->runRestMethod());
+        $this->runRestMethod();
     }
 
     public function renderRestGet($id, array $data = [])
     {
-        $this->sendResponse($this->runRestMethod());
+        $this->runRestMethod();
     }
 
     public function renderRestCreate(array $data)
     {
-        $this->sendResponse($this->runRestMethod());
+        $this->runRestMethod();
     }
 
     public function renderRestUpdate($id, array $data)
     {
-        $this->sendResponse($this->runRestMethod());
+        $this->runRestMethod();
     }
 
     public function renderRestDelete($id, array $data = [])
     {
-        $this->sendResponse($this->runRestMethod());
+        $this->runRestMethod();
     }
 
     public function renderRestClone($id, array $data)
     {
-        $this->sendResponse($this->runRestMethod());
+        $this->runRestMethod();
     }
 
 
@@ -109,26 +112,37 @@ trait RestPresenter
 
     /// PROTECTED & PRIVATE METHODS
 
+    public function getRestRequest(): RestRequest
+    {
+        if (!$this->restRequest) {
+            $this->restRequest = new RestRequest($this);
+        }
+
+        return $this->restRequest;
+    }
+
     private function runRestMethod()
     {
-        $request = new RestRequest($this->plugins, $this);
+        $result = $this->getRestRequest()->run();
+        $this->sendResponse($result);
+
+        /*$request = new RestRequest($this->plugins, $this);
         $result = $request->next();
 
         if (!($result instanceof IResult))
             $result = new Json($result);
 
-        $this->sendResponse($result->run($request));
+        $this->sendResponse($result->run($request));*/
     }
 
-    private function apiMethodSkeleton(callable $body)
+    private function apiMethodSkeleton(callable $body): mixed
     {
         if ($this->modelClass()) {
             $class = $this->modelClass();
-
             return call_user_func($body, $class);
 
         } else {
-            $this->sendJsonError('Method not supported', \Nette\Http\Response::S405_METHOD_NOT_ALLOWED);
+            return new Termination('Method not supported', Response::S405_METHOD_NOT_ALLOWED);
         }
     }
 
@@ -137,6 +151,8 @@ trait RestPresenter
 
     protected function plugin($class)
     {
+        return $this->getRestRequest()->getPlugins()
+
         $plugin = PluginConfiguration::find($class, $this->plugins);
 
         if (!$plugin) {
@@ -155,9 +171,9 @@ trait RestPresenter
      *
      * @return class
      */
-    protected function modelClass()
+    protected function modelClass(): ?string
     {
-        return NULL;
+        return null;
     }
 
     protected function methodsOnly()
