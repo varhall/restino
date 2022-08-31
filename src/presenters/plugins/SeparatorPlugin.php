@@ -10,7 +10,7 @@ class SeparatorPlugin extends Plugin
     {
         $separated = [];
         foreach ($args[0] as $property) {
-            if (isset($request->data[$property])) {
+            if (array_key_exists($property, $request->data)) {
                 $separated[$property] = $request->data[$property];
                 unset($request->data[$property]);
             }
