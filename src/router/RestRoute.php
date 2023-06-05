@@ -73,7 +73,7 @@ class RestRoute extends AbstractRoute
             $request['data'] = isset($data['request_data']) ? $data['request_data'] : $data;
 
             // filter only valid keys
-            $request = array_intersect_key($request, array_flip([ 'module', 'presenter', 'action', 'id', 'data' ]));
+            //$request = array_intersect_key($request, array_flip([ 'module', 'presenter', 'action', 'id', 'data' ]));
         }
 
         return $request;
