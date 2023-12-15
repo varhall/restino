@@ -1,0 +1,7 @@
+services:
+	restino.mapping: Varhall\Restino\Mapping\MappingService
+	restino.middlewares.chain: Varhall\Restino\Middlewares\Chain
+	restino.middlewares.factory: Varhall\Restino\Middlewares\Factory
+	#restino.middlewares.cors: Varhall\Restino\Middlewares\CorsMiddleware
+	#restino.middlewares.authentication: Varhall\Restino\Middlewares\AuthenticationMiddleware
+

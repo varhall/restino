@@ -1,14 +1,25 @@
 <?php
-require __DIR__ . '/../vendor/autoload.php';
 
-Tester\Environment::setup();
-date_default_timezone_set('Europe/Prague');
+use Ninjify\Nunjuck\Environment;
 
-function test(string $description, Closure $fn): void
-{
-    echo $description, "\n";
-    $fn();
+if (@!include __DIR__ . '/../vendor/autoload.php') {
+    echo 'Install Nette Tester using `composer update --dev`';
+    exit(1);
 }
+
+// Configure environment
+\Tester\Environment::bypassFinals();
+Environment::setup(__DIR__);
+
+define('SRC_DIR', realpath(TESTER_DIR . '/../src'));
+define('CONFIG_DIR', TESTER_DIR . '/config');
+
+Environment::setupRobotLoader(function($loader) {
+    $loader->addDirectory(__DIR__);
+    $loader->addDirectory(SRC_DIR);
+    $loader->setAutoRefresh(true);
+});
+
 
 function dump(...$args)
 {
@@ -17,7 +28,9 @@ function dump(...$args)
     }
 }
 
-function dumpe(...$args) {
+function dumpe(...$args)
+{
     dump(...$args);
+    \Tester\Assert::fail('Dump variable');
     die();
 }
