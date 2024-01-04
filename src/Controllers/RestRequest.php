@@ -14,7 +14,7 @@ class RestRequest
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->parameters = $request->getParameter('data') ?? [];
+        $this->parameters = $request->getParameters();
     }
 
     public function getRequest(): Request

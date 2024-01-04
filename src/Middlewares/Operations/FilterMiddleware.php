@@ -4,6 +4,7 @@ namespace Varhall\Restino\Middlewares\Operations;
 
 use Nette\Database\Table\Selection;
 use Nette\Http\Request;
+use Varhall\Dbino\Collections\Collection;
 use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Results\IResult;
 
@@ -20,14 +21,14 @@ class FilterMiddleware implements IMiddleware
     {
         $result = $next($request);
 
-        if ($result->getData() instanceof Selection) {
+        if ($result->getData() instanceof Selection || $result->getData() instanceof Collection) {
             $this->filter($result->getData());
         }
 
         return $result;
     }
 
-    protected function filter(Selection $data): Selection
+    protected function filter(Selection|Collection $data): Selection|Collection
     {
         $parameters = $this->getFilterParameters();
 
@@ -194,11 +195,5 @@ class FilterMiddleware implements IMiddleware
         }
 
         return null;
-    }
-
-    protected function requestedRules(RestRequest $request): array
-    {
-        $expand = $request->getParameter(self::QUERY_PARAMETER, '');
-        return array_map('trim', explode(',', $expand));
     }
 }

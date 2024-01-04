@@ -1,0 +1,56 @@
+name: "Tests"
+
+on:
+  pull_request:
+    paths-ignore:
+      - ".docs/**"
+  push:
+    branches:
+      - "*"
+  schedule:
+    - cron: "0 8 * * 1" # At 08:00 on Monday
+
+env:
+  extensions: "json, pdo_mysql"
+
+jobs:
+  tests:
+    name: "Tests"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        php: [ "8.3", "8.2", "8.1" ]
+        os: [ubuntu-latest]
+
+#    services:
+#      database:
+#        image: mariadb:latest
+#        ports:
+#          - 3306:3306
+#        env:
+#          MYSQL_ROOT_PASSWORD: 'test'
+#          MYSQL_DATABASE: 'test'
+#        options: --health-cmd="healthcheck.sh --su-mysql --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: "${{ env.extensions }}"
+
+      - run: composer install --no-progress --prefer-dist
+
+      - run: make tests
+        shell: bash
+        env:
+          DATABASE_DSN: 'mysql:host=127.0.0.1;port=3306;dbname=test'
+          DATABASE_USER: 'root'
+          DATABASE_PASSWORD: 'test'
+
+      - if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: output
+          path: tests/**/output
+

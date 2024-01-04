@@ -34,14 +34,14 @@ For details on how to use this package, check out our [documentation](.docs).
 
 ## Versions
 
-| State       | Version       | Branch   | Nette | PHP     |
-|-------------|---------------|----------|-------|---------|
-| dev         | `dev-master`  | `master` | 3.0+  | `^7.4`  |
-| stable      | `^1.0`        | `master` | 3.0+  | `^7.4`  |
+| State       | Version       | Branch   | Nette | PHP    |
+|-------------|---------------|----------|-------|--------|
+| dev         | `dev-master`  | `master` | 3.1+  | `^8.1` |
+| stable      | `^1.0`        | `master` | 3.1+  | `^8.1` |
 
 ## Development
 
-This package is currently maintaining by these authors.
+This package is currently maintained by these authors.
 
 <a href="https://github.com/varhall">
   <img width="80" height="80" src="https://avatars.githubusercontent.com/u/165651?v=4">

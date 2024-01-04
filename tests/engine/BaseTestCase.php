@@ -30,6 +30,6 @@ abstract class BaseTestCase extends TestCase
             ]
         ];
 
-        return new RestRequest(new Request('', null, [ 'data' => $params ]));
+        return new RestRequest(new Request('', null, $params));
     }
 }
