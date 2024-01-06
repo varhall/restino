@@ -16,6 +16,8 @@
     - [Middleware parameters](#middleware-parameters)
     - [Terminating middleware](#terminating-middleware)
     - [Before and after middleware](#before-and-after-middleware)
+- [Middleware attributes](#middleware-attributes)
+    - [Custom middleware attributes](#custom-middleware-attributes)
 
 <a name="introduction"></a>
 ## Introduction
@@ -458,3 +460,85 @@ is called after the custom code.
         return $result;
     }
 
+<a name="middleware-attributes"></a>
+## Middleware attributes
+
+In some case it is nice to activate middleware with special attribute. For example to activate authentication
+or allow only clients with specific role. The role middleware activated with attribute could look like this.
+
+    <?php
+
+    namespace App\Presenters;
+
+    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Middlewares\Attributes\Role;
+
+    class UsersPresenter extends RestController
+    {
+        #[Role('admin')]
+        public function index(): ICollection
+        {
+            return User::all();
+        }
+    }
+
+In this case `#[Role]` attribute activates the role middleware, so the `index` endpoint has `RoleMiddleware` enabled.
+The attribute can be used on class or method level. In the example below, only users with role `admin` can access
+all the endpoints in `UsersPresenter`.
+
+    <?php
+
+    namespace App\Presenters;
+
+    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Middlewares\Attributes\Role;
+
+    #[Role('admin')]
+    class UsersPresenter extends RestController
+    {
+        public function index(): ICollection
+        {
+            return User::all();
+        }
+    }
+
+There is also `#[Secured]` attribute which activates authentication middleware. The purpose is very similar,
+but it allows any users for `$user->isLoggedIn()` method returns true.
+
+    <?php
+
+    namespace App\Presenters;
+
+    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Middlewares\Attributes\Secured;
+
+    #[Secured]
+    class UsersPresenter extends RestController
+    {
+        public function index(): ICollection
+        {
+            return User::all();
+        }
+    }
+
+<a name="custom-middleware-attributes"></a>
+### Custom middleware attributes
+
+The implementation of custom middleware attribute is very simple. The attribute must implement `Varhall\Restino\Middlewares\Attributes\IMiddlewareAttribute`
+which defines the factory method to create a proper middleware.
+
+    <?php
+
+    namespace App\Presenters;
+
+    use Varhall\Restino\Middlewares\Attributes\IMiddlewareAttribute;
+    use Varhall\Restino\Middlewares\Operations\IMiddleware;
+
+    #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
+    class Custom implements IMiddlewareAttribute
+    {
+        public function middleware(Factory $factory): IMiddleware
+        {
+            return $factory->create(CustomMiddleware::class);
+        }
+    }

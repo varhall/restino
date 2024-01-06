@@ -23,7 +23,7 @@ Enable Restino extension in config.neon file. You can also globally enable some 
 
 At first, it is necessary to define routes for your API. You can use standard Nette routing but with `RestRoute`.
 
-    $router[] = new RestRoute('api/<presenter>[/<id>]');
+    $router[] = new RestRoute('api/<presenter>');
 
 ### Presenters
 

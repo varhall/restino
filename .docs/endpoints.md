@@ -7,6 +7,7 @@
     - [Create](#method-create)
     - [Update](#method-update)
     - [Delete](#method-delete)
+- [Subrouting](#subrouting)
 - [Input parameters](#input-parameters)
   - [Simple parameters](#parameters-simple)
   - [Complex parameters](#parameters-complex)
@@ -174,6 +175,35 @@ can be anything not only the `Varhall\Dbino\Model`. The typical result is `Nette
         }
     }
 
+<a name="subrouting"></a>
+## Subrouting
+
+Except the standard endpoints methods, it is possible to define custom methods. These methods are mapped to HTTP methods
+and URL path. The method is defined using attributes `#[Get]`, `#[Post]`, `#[Put]` and `#[Delete]`. The url path is defined
+in attribute parameter. The path can contain parameters defined in standard [Nette routing](https://doc.nette.org/cs/application/routing).
+
+The example of custom method is `activate` which is mapped to `POST /api/users/<id>/activate`.
+
+    <?php
+
+    namespace App\Presenters;
+
+    use App\Models\User;
+    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Utilino\Collections\ICollection;
+    use Varhall\Restino\Attributes\Post;
+
+    class UsersPresenter extends RestController
+    {
+        #[Post('/<id>/activate')]
+        public function activate(int $id): User
+        {
+            return User::find($id)->update(['enabled' => true]);
+        }
+    }
+
+The path defined in attribute is relative to the controller path. The controller path is defined in `RestRoute` definition
+inside RouterFactory.
 
 <a name="input-parameters"></a>
 ## Input parameters
@@ -222,7 +252,7 @@ are taken from request properties
     {
           public function create(UserInput $data): User
           {
-                // the code    
+              // the code    
           }
     }
 
