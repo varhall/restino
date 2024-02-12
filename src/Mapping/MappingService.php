@@ -9,6 +9,10 @@ class MappingService
 {
     public function process(Target $parameter, RestRequest $request): mixed
     {
+        if ($parameter->getType()->getName() === RestRequest::class) {
+            return $request;
+        }
+
         $processor = new Processor();
 
         $schema = $parameter->getMapper()->schema($parameter);

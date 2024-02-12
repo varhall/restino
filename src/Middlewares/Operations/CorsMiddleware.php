@@ -21,20 +21,25 @@ class CorsMiddleware implements IMiddleware
 
     public function __invoke(RestRequest $request, callable $next): IResult
     {
+        $this->setHeaders();
+
         if ($request->getRequest()->getMethod() === 'OPTIONS') {
-            $this->response->setHeader('Access-Control-Allow-Origin', $this->options['allow_origin'] ?? '*');
-
-            $this->response->setHeader('Access-Control-Allow-Headers', join(', ',
-                $this->options['allow_headers'] ?? [ 'Content-type', 'Authorization' ]
-            ));
-
-            $this->response->setHeader('Access-Control-Allow-Methods', join(', ',
-                $this->options['allow_methods'] ?? [ 'GET', 'POST', 'PUT', 'DELETE' ]
-            ));
-
             return new Termination('', IResponse::S200_OK);
         }
 
         return $next($request);
+    }
+
+    protected function setHeaders(): void
+    {
+        $this->response->setHeader('Access-Control-Allow-Origin', $this->options['allow_origin'] ?? '*');
+
+        $this->response->setHeader('Access-Control-Allow-Headers', join(', ',
+            $this->options['allow_headers'] ?? [ 'Content-type', 'Authorization' ]
+        ));
+
+        $this->response->setHeader('Access-Control-Allow-Methods', join(', ',
+            $this->options['allow_methods'] ?? [ 'GET', 'POST', 'PUT', 'DELETE' ]
+        ));
     }
 }

@@ -52,15 +52,7 @@ class ActionRouterTest extends BaseTestCase
 
     public function testRoute_invalid()
     {
-        $router = new ActionRouter(
-            new \Nette\Http\Request(new UrlScript('http://localhost/api/foo/test/invalid', '/'), method: 'GET'),
-            mock(MappingService::class)
-        );
-
-        $request = new \Nette\Application\Request('Api', 'GET', [ 'mask' => 'api/<presenter>' ]);
-        $action = $router->route($this->prepareController(), $request);
-
-        Assert::null($action);
+        $this->test('GET', 'http://localhost/api/foo/test/unknown', 'invalid');
     }
 
 

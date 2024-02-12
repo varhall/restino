@@ -2,7 +2,7 @@
 
 namespace Varhall\Restino\Router;
 
-use Nette\Routing\Route;
+use Nette\Application\Routers\Route;
 
 class RestRoute extends Route
 {
@@ -21,7 +21,7 @@ class RestRoute extends Route
 
         if ($request !== null) {
             return [
-                'presenter' => ucfirst(strtolower($request['presenter'])),
+                'presenter' => $request['presenter'],
                 'mask'      => $this->baseMask,
             ];
         }

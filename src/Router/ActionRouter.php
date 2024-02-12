@@ -20,7 +20,7 @@ class ActionRouter
         $this->mapping = $mapping;
     }
 
-    public function route(RestController $controller, Request &$request): ?Action
+    public function route(RestController $controller, Request &$request): Action
     {
         $routes = $this->getRoutes($controller, $request->getParameter('mask') ?? '');
 
@@ -34,7 +34,7 @@ class ActionRouter
             }
         }
 
-        return null;
+        return new Action(new \ReflectionMethod($controller, 'invalid'), $controller, $this->mapping);
     }
 
     protected function getRoutes(RestController $controller, string $mask): array

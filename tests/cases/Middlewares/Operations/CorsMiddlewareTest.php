@@ -16,10 +16,7 @@ class CorsMiddlewareTest extends BaseTestCase
 {
     public function testExecute()
     {
-        $response = mock(IResponse::class);
-        $response->shouldReceive('setHeader')->with('Access-Control-Allow-Origin', '*')->once();
-        $response->shouldReceive('setHeader')->with('Access-Control-Allow-Headers', 'Content-type, Authorization')->once();
-        $response->shouldReceive('setHeader')->with('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')->once();
+        $response = $this->createResponse();
 
         $request = $this->prepareRequest();
         $request->getRequest()->setMethod('OPTIONS');
@@ -33,14 +30,26 @@ class CorsMiddlewareTest extends BaseTestCase
 
     public function testNext()
     {
+        $response = $this->createResponse();
+
         $request = $this->prepareRequest();
         $request->getRequest()->setMethod('GET');
 
-        $middleware = new CorsMiddleware(mock(IResponse::class));
+        $middleware = new CorsMiddleware($response);
 
         $result = $middleware($request, fn($x) => new Result(1));
 
         Assert::type(Result::class, $result);
+    }
+
+    private function createResponse(): IResponse
+    {
+        $response = mock(IResponse::class);
+        $response->shouldReceive('setHeader')->with('Access-Control-Allow-Origin', '*')->once();
+        $response->shouldReceive('setHeader')->with('Access-Control-Allow-Headers', 'Content-type, Authorization')->once();
+        $response->shouldReceive('setHeader')->with('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')->once();
+
+        return $response;
     }
 }
 

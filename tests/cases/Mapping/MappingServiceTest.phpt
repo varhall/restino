@@ -151,6 +151,17 @@ class MappingServiceTest extends BaseTestCase
 
         Assert::equal($expected, $result);
     }
+
+    public function testRestRequest()
+    {
+        $service = new MappingService();
+        $target = $this->createTarget(function(RestRequest $request) {});
+        $request = spy(RestRequest::class);
+
+        $result = $service->process($target, $request);
+
+        Assert::equal($request, $result);
+    }
 }
 
 (new MappingServiceTest())->run();
