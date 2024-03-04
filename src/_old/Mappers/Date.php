@@ -1,12 +1,12 @@
 <?php
 
-namespace Varhall\Restino\Mapping\Mappers;
+namespace Varhall\Restino\OldMapping\Mappers;
 
 
 use Nette\Schema\Schema;
 use Nette\Utils\DateTime;
 use Nette\Utils\Validators;
-use Varhall\Restino\Mapping\Target;
+use Varhall\Restino\OldMapping\Target;
 
 class Date implements IMapper
 {

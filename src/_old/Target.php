@@ -1,11 +1,11 @@
 <?php
 
-namespace Varhall\Restino\Mapping;
+namespace Varhall\Restino\OldMapping;
 
 use Nette\Utils\Type;
-use Varhall\Restino\Mapping\Mappers\IMapper;
-use Varhall\Restino\Mapping\Mappers\Nothing;
-use Varhall\Restino\Mapping\Mappers as M;
+use Varhall\Restino\OldMapping\Mappers\IMapper;
+use Varhall\Restino\OldMapping\Mappers\Nothing;
+use Varhall\Restino\OldMapping\Mappers as M;
 
 /**
  * @method string getName()

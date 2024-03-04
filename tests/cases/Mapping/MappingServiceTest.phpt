@@ -2,7 +2,6 @@
 
 namespace Tests\Cases\Casts;
 
-use Nette\Application\Request;
 use Nette\Schema\ValidationException;
 use Nette\Utils\DateTime;
 use Tester\Assert;
@@ -14,7 +13,6 @@ use Tests\Fixtures\Models\BookRequired;
 use Tests\Fixtures\Models\UserInput;
 use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Mapping\MappingService;
-use Varhall\Restino\Mapping\Rule;
 
 require_once __DIR__ . '/../../bootstrap.php';
 

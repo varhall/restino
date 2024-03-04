@@ -4,6 +4,7 @@ namespace Varhall\Restino\Mapping;
 
 use Nette\Schema\Processor;
 use Varhall\Restino\Controllers\RestRequest;
+use Varhall\Utilino\Mapping\Target;
 
 class MappingService
 {
@@ -13,24 +14,30 @@ class MappingService
             return $request;
         }
 
-        $processor = new Processor();
+        $data = $request->getParameters();
+        $value = $this->isClassType($parameter)
+                    ? $data
+                    : (array_key_exists($parameter->getName(), $data) ? $data[$parameter->getName()] : null);
 
-        $schema = $parameter->getMapper()->schema($parameter);
-        $data = $this->normalize($parameter, $request);
-
-        return $processor->process($schema, $data);
+        return (new Processor())->process($parameter->schema(), $value);
     }
 
-    protected function normalize(Target $target, RestRequest $request): mixed
+    protected function isClassType(Target $parameter): bool
     {
-        $data = $request->getParameters();
-
-        if ($target->isClassType()) {
-            return $target->getMapper()->apply($data);
+        if (!$parameter->getType()) {
+            return false;
         }
 
-        return array_key_exists($target->getName(), $data)
-            ? $target->getMapper()->apply($data[$target->getName()])
-            : null;
+        $type = $parameter->getType()->getName();
+
+        if (!class_exists($type)) {
+            return false;
+        }
+
+        if ($type === \DateTime::class || is_subclass_of($type, \DateTime::class)) {
+            return false;
+        }
+
+        return true;
     }
 }

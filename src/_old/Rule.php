@@ -1,6 +1,6 @@
 <?php
 
-namespace Varhall\Restino\Mapping;
+namespace Varhall\Restino\OldMapping;
 
 use Attribute;
 

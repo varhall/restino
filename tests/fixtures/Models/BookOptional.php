@@ -2,13 +2,14 @@
 
 namespace Tests\Fixtures\Models;
 
-use Varhall\Restino\Mapping\Rule;
+
+use Varhall\Utilino\Mapping\Attributes\Rule;
 
 class BookOptional
 {
-    #[Rule('string:1..', required: false)]
+    #[Rule('string:1..')]
     public string $name;
 
-    #[Rule('int', required: false)]
+    #[Rule('int')]
     public int $price;
 }

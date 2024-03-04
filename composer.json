@@ -21,7 +21,7 @@
 		"nette/application": ">=v3.1",
 		"nette/http": ">=v3.2",
 		"nette/security": ">=v3.1",
-		"varhall/utilino": ">=v1.1",
+		"varhall/utilino": "dev-master",
 		"firebase/php-jwt": "^v6.10"
 	},
 

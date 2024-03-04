@@ -1,11 +1,11 @@
 <?php
 
-namespace Varhall\Restino\Mapping\Mappers;
+namespace Varhall\Restino\OldMapping\Mappers;
 
 
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Varhall\Restino\Mapping\Target;
+use Varhall\Restino\OldMapping\Target;
 
 class Structure implements IMapper
 {
