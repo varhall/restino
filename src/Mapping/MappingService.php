@@ -10,7 +10,7 @@ class MappingService
 {
     public function process(Target $parameter, RestRequest $request): mixed
     {
-        if ($parameter->getType()->getName() === RestRequest::class) {
+        if ($parameter->getType()?->getName() === RestRequest::class) {
             return $request;
         }
 
