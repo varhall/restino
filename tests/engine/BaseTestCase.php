@@ -5,7 +5,7 @@ namespace Tests\Engine;
 use Nette\Application\Request;
 use Tester\TestCase;
 use Varhall\Restino\Controllers\RestRequest;
-use Varhall\Restino\Mapping\Target;
+use Varhall\Utilino\Mapping\Target;
 
 abstract class BaseTestCase extends TestCase
 {

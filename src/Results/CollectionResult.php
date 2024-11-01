@@ -4,6 +4,7 @@ namespace Varhall\Restino\Results;
 
 use Nette\Database\Table\Selection;
 use Nette\Http\IResponse;
+use Varhall\Dbino\Collections\Collection;
 use Varhall\Utilino\Collections\ICollection;
 
 class CollectionResult extends AbstractResult
@@ -70,7 +71,7 @@ class CollectionResult extends AbstractResult
         // execute collection
         $this->data = $this->data->limit($this->limit, $this->offset);
 
-        if ($this->data instanceof Selection) {
+        if ($this->data instanceof Selection || $this->data instanceof Collection) {
             foreach ($this->order as $column => $desc) {
                 $this->data = $this->data->order($column . ($desc ? ' DESC' : ' ASC'));
             }

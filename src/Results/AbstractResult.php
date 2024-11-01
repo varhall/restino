@@ -19,6 +19,10 @@ abstract class AbstractResult implements IResult
             $result = $mapper($result, $item);
         }
 
+        // serialize again because mappers can return objects (expansions)
+        // TODO: think up better alternative
+        $result = $this->serializeItem($result);
+
         return $result;
     }
 

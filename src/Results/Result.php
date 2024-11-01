@@ -21,6 +21,10 @@ class Result extends AbstractResult
 
     public function execute(IResponse $http): mixed
     {
+        if ($this->data instanceof IResult) {
+            return $this->data->execute($http);
+        }
+
         if (is_array($this->data) || ($this->data instanceof \Traversable && !($this->data instanceof ActiveRow))) {
             return array_values(array_map(fn($x) => $this->serialize($x), is_array($this->data) ? $this->data : iterator_to_array($this->data)));
         }

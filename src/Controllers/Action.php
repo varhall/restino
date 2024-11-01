@@ -2,13 +2,12 @@
 
 namespace Varhall\Restino\Controllers;
 
-use Nette\Application\Request;
 use Nette\Http\IResponse;
 use Varhall\Restino\Mapping\MappingService;
-use Varhall\Restino\Mapping\Target;
 use Varhall\Restino\Results\IResult;
 use Varhall\Restino\Results\Result;
 use Varhall\Restino\Results\Termination;
+use Varhall\Utilino\Mapping\Target;
 
 class Action
 {

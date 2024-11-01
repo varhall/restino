@@ -2,7 +2,8 @@
 
 namespace Tests\Fixtures\Models;
 
-use Varhall\Restino\Mapping\Rule;
+use Nette\Utils\DateTime;
+use Varhall\Utilino\Mapping\Attributes\Rule;
 
 class UserInput
 {
@@ -15,10 +16,10 @@ class UserInput
     #[Rule('email')]
     public string $email;
 
-    #[Rule('int', required: false)]
+    #[Rule('int')]
     public $age;
 
-    public \DateTime $created;
+    public DateTime $created;
 
     public Address $address;
 }
