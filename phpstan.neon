@@ -1,0 +1,13 @@
+includes:
+	- vendor/contributte/phpstan/phpstan.neon
+
+parameters:
+	level: 8
+	phpVersion: 80100
+
+	paths:
+		- src
+		- .docs
+
+	reportMaybesInPropertyPhpDocTypes: false
+	checkGenericClassInNonGenericObjectType: false

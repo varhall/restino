@@ -1,25 +1,13 @@
-<?php
+<?php declare(strict_types = 1);
 
-use Ninjify\Nunjuck\Environment;
+use Contributte\Tester\Environment;
 
 if (@!include __DIR__ . '/../vendor/autoload.php') {
     echo 'Install Nette Tester using `composer update --dev`';
     exit(1);
 }
 
-// Configure environment
-\Tester\Environment::bypassFinals();
 Environment::setup(__DIR__);
-
-define('SRC_DIR', realpath(TESTER_DIR . '/../src'));
-define('CONFIG_DIR', TESTER_DIR . '/config');
-
-Environment::setupRobotLoader(function($loader) {
-    $loader->addDirectory(__DIR__);
-    $loader->addDirectory(SRC_DIR);
-    $loader->setAutoRefresh(true);
-});
-
 
 function dump(...$args)
 {

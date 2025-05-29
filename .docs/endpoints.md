@@ -1,13 +1,8 @@
 # Endpoints
 
 - [Controller definition](#controller-definition)
-- [Endpoint methods](#endpoint-methods)
-    - [Index](#method-index)
-    - [Get](#method-get)
-    - [Create](#method-create)
-    - [Update](#method-update)
-    - [Delete](#method-delete)
-- [Subrouting](#subrouting)
+- [Routing](#routing)
+- [Schema generator](#schema-generator)
 - [Input parameters](#input-parameters)
   - [Simple parameters](#parameters-simple)
   - [Complex parameters](#parameters-complex)
@@ -20,180 +15,121 @@
 <a name="controller-definition"></a>
 ## Controller definition
 
-Controller is basically a Nette Presenter. It extends `Varhall\Restino\Controllers\RestController` class. 
-There are 5 key endpoints methods `index`, `get`, `create`, `update` and `delete`. These standard methods
-mapped to HTTP methods `GET`, `POST`, `PUT` and `DELETE`.
+Controller is key unit of Restino. It requires `Varhall\Restino\Controllers\IController` interface.
+Controller consists of methods which are mapped to HTTP methods and URL paths. These methods are called 
+endpoints or actions. Endpoints are mapped to HTTP methods using `Schema` which can be easily generated
+using `SchemaGenerator` and PHP attributes.
+
+Basic definition of controller can look like:
+
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
     use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
     use Varhall\Utilino\Collections\ICollection;
+    use Varhall\Restino\Controllers\IController;
+    use Varhall\Restino\Controllers\Attributes\Path;
+    use Varhall\Restino\Controllers\Attributes\Get;
+    use Varhall\Restino\Controllers\Attributes\Post;
+    use Varhall\Restino\Controllers\Attributes\Put;
+    use Varhall\Restino\Controllers\Attributes\Delete;
 
-    class UsersPresenter extends RestController
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
+        #[Get]  
         public function index(): ICollection
         {
             return User::all();
         }
 
+        #[Get('/{id}')]  
         public function get(int $id): User
         {
             return User::find($id);
         }
         
+        #[Post]
         public function create(array $data): User
         {
             return User::create($data);
         }
 
-        public function create(int $id, array $data): User
-        {
-            return User::find($id)->update($data);
-        }
-
-        public function delete(int $id): void
-        {
-            User::find($id)->delete();
-        }
-    }
-
-
-<a name="endpoint-methods"></a>
-## Endpoint methods
-
-<a name="method-index"></a>
-### Index
-
-The `index` method is mapped to HTTP method `GET` without ID parameter and is intended to retrieve a collection of models.
-The result can be anything not only the `ICollection`. The typical result is `Nette\Database\Table\Selection` or `array`.
-But in some API designs it can be also single object instance or primitive value.
-
-    <?php
-
-    namespace App\Presenters;
-
-    use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
-    use Varhall\Utilino\Collections\ICollection;
-
-    class UsersPresenter extends RestController
-    {
-        public function index(): ICollection
-        {
-            return User::all();
-        }
-    }
-
-<a name="method-get"></a>
-### Get
-
-The `get` method is mapped to HTTP method `GET` with ID parameter and is intended to retrieve a single model. The result
-can be anything not only the `Varhall\Dbino\Model`. The typical result is `Nette\Database\Table\ActiveRow` or `object`.
-
-    <?php
-
-    namespace App\Presenters;
-
-    use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
-    use Varhall\Utilino\Collections\ICollection;
-
-    class UsersPresenter extends RestController
-    {
-        public function get(int $id): User
-        {
-            return User::find($id);
-        }
-    }
-
-<a name="method-create"></a>
-### Create
-
-The `create` method is mapped to HTTP method `POST` without ID parameter and is intended to create a new model. The result
-can be anything not only the `Varhall\Dbino\Model`. The typical result is `Nette\Database\Table\ActiveRow` or confirmation message.
-
-    <?php
-
-    namespace App\Presenters;
-
-    use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
-    use Varhall\Utilino\Collections\ICollection;
-
-    class UsersPresenter extends RestController
-    {
-        public function create(array $data): User
-        {
-            return User::create($data);
-        }
-    }
-
-<a name="method-update"></a>
-### Update
-
-The `update` method is mapped to HTTP method `PUT` with ID parameter and is intended to update an existing model. The result
-can be anything not only the `Varhall\Dbino\Model`. The typical result is `Nette\Database\Table\ActiveRow` or confirmation message.
-
-    <?php
-
-    namespace App\Presenters;
-
-    use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
-    use Varhall\Utilino\Collections\ICollection;
-
-    class UsersPresenter extends RestController
-    {
+        #[Put('/{id}')]
         public function update(int $id, array $data): User
         {
             return User::find($id)->update($data);
         }
-    }
 
-<a name="method-delete"></a>
-### Delete
-
-The `delete` method is mapped to HTTP method `DELETE` with ID parameter and is intended to delete an existing model. The result
-can be anything not only the `Varhall\Dbino\Model`. The typical result is `Nette\Database\Table\ActiveRow` or confirmation message.
-
-    <?php
-
-    namespace App\Presenters;
-
-    use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
-    use Varhall\Utilino\Collections\ICollection;
-
-    class UsersPresenter extends RestController
-    {
+        #[Delete('/{id}')]
         public function delete(int $id): void
         {
             User::find($id)->delete();
         }
     }
 
-<a name="subrouting"></a>
-## Subrouting
+<a name="routing"></a>
+## Routing
 
-Except the standard endpoints methods, it is possible to define custom methods. These methods are mapped to HTTP methods
-and URL path. The method is defined using attributes `#[Get]`, `#[Post]`, `#[Put]` and `#[Delete]`. The url path is defined
-in attribute parameter. The path can contain parameters defined in standard [Nette routing](https://doc.nette.org/cs/application/routing).
+As in standard Nette application, the routing is usually defined in `RouterFactory`. The `ApiRouter` 
+maps HTTP requests to controllers. The `ApiRouter` requires `Schema` object which can be generated using
+`SchemaGenerator` automatically. If automatic scanning is not desired, the `Schema` can be defined manually
+or loaded from file.
 
-The example of custom method is `activate` which is mapped to `POST /api/users/<id>/activate`.
+The example of possible `RouterFactory` can look like this:
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Router;
+
+    use Nette\Application\Routers\RouteList;
+    use Varhall\Restino\Router\ApiRouter;
+    use Varhall\Restino\Schema\SchemaGenerator;
+
+    final class RouterFactory
+    {
+        public function __construct(private SchemaGenerator $schema)
+        {
+        }
+        
+        public function create(): RouteList
+        {
+            $router = new RouteList();
+
+            $router[] = new ApiRouter($this->schema->getSchema());
+
+            return $router;
+        }
+    }
+
+<a name="schema-generator"></a>
+## Schema generator
+
+The easiest way to generate `Schema` object is to use `SchemaGenerator` which scans your controllers
+and generates the schema based on PHP attributes. To define a schema group, `#[Path]` attribute is used.
+This path is relative to the base path of the API and all endpoints in the controller will be relative to this path.
+
+Endpoints are defined using attributes `#[Get]`, `#[Post]`, `#[Put]` and `#[Delete]`. These attributes map the action 
+function to the HTTP method and URL path. If path is not defined in the attribute, it defaults to the controller path.
+
+Path definition can contain parameters. Parameters are defined in curly braces e.g. `{id}`. These parameters
+are automatically extracted from the URL and passed to the action method as parameters or processed as input parameters
+through `MappingService`.
+
+    <?php
+
+    namespace App\Controllers;
 
     use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Controllers\IController;
     use Varhall\Utilino\Collections\ICollection;
-    use Varhall\Restino\Attributes\Post;
+    use Varhall\Restino\Controller\Attributes\Path;
+    use Varhall\Restino\Controller\Attributes\Post;
 
-    class UsersPresenter extends RestController
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
         #[Post('/<id>/activate')]
         public function activate(int $id): User
@@ -210,22 +146,25 @@ inside RouterFactory.
 
 API endpoint methods can have input parameters. These parameters are automatically filled from request data.
 There automatic mapping and validation of input parameters. The input parameters can be defined using. Values
-are taken from query string in case of `GET` and `DELETE` methods and from request body in JSON in case of `POST` 
-and `PUT` methods.
+are taken from request.
 
 <a name="parameters-simple"></a>
 ### Simple parameters
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
     use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Controllers\IController;
     use Varhall\Utilino\Collections\ICollection;
+    use Varhall\Restino\Controller\Attributes\Path;
+    use Varhall\Restino\Controller\Attributes\Get;
 
-    class UsersPresenter extends RestController
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
+        #[Get]
         public function index(string $type, bool $enabled): ICollection
         {
             return User::all()->where('type', $type)->where('enabled', $enabled);
@@ -242,14 +181,18 @@ are taken from request properties
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
     use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Controllers\IController;
     use Varhall\Utilino\Collections\ICollection;
+    use Varhall\Restino\Controller\Attributes\PAth;
+    use Varhall\Restino\Controller\Attributes\Post;
 
-    class UsersPresenter extends RestController
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
+          #[Post]
           public function create(UserInput $data): User
           {
               // the code    
@@ -260,7 +203,7 @@ Class `UserInput` can look like this:
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
     class UserInput
     {
@@ -288,7 +231,7 @@ are taken from request properties
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
     class UserInput
     {
@@ -326,9 +269,9 @@ The rules can be defined using PHP attribute `#[Rule]`.
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
-    use Varhall\Restino\Attributes\Rule;
+    use Varhall\Utilino\Mapping\Attributes\Rule;
     
     class UserInput
     {
@@ -354,12 +297,15 @@ Method parameters are validated same way as complex input parameters. The rules 
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
-    use Varhall\Restino\Attributes\Rule;
-    
-    class UsersPresenter extends RestController
+    use Varhall\Utilino\Mapping\Attributes\Rule;
+    use Varhall\Restino\Controller\Attributes\Path;
+
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
+        #[Get]
         public function index(#[Rule('string:3..')] string $type): ICollection
         {
             return User::all()->where('type', $type)->where('enabled', $enabled);
@@ -369,22 +315,27 @@ Method parameters are validated same way as complex input parameters. The rules 
 <a name="setup"></a>
 ## Setup
 
-Controller has special method `setup` which is called before any endpoint method. It can be used to configure
-the controller. Typical usage is to register or configure middleware.
+Controller has special method `setup` which is called before each endpoint method. It can be used to configure
+the controller. Typical usage is to register or configure filters.
 
     <?php
 
-    namespace App\Presenters;
+    namespace App\Controllers;
 
     use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Controllers\IController;
     use Varhall\Utilino\Collections\ICollection;
+    use Varhall\Restino\Controller\Attributes\Post;
+    use Varhall\Restino\Filters\Chain;
 
-    class UsersPresenter extends RestController
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
+        public function __construct(private Chain $filters) {}
+
         public function setup(): void
         {
-            $this->middleware('authentication')->except('create');
+            $this->filters->get('authentication')->except('create');
         }
     }
 

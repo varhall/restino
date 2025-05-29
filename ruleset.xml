@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<ruleset name="Varhall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+    <description>Varhall</description>
+
+    <!-- Extending rulesets -->
+    <rule ref="./vendor/contributte/qa/ruleset-8.0.xml"/>
+
+    <!-- Specific rules -->
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+        <properties>
+            <property name="rootNamespaces" type="array">
+                <element key="src" value="Varhall\Restino"/>
+                <element key="tests" value="Tests"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses.UnusedUse">
+        <!-- false positive; slevomat ignores attribute class names and removes their imports -->
+        <exclude-pattern>tests/Fixtures/Controllers/AttributeFoobarController.php</exclude-pattern>
+        <exclude-pattern>tests/Fixtures/Controllers/AttributeMultiController.php</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>*tests/Cases/*</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference">
+        <exclude-pattern>src/Core/Schema/Serialization/ArraySerializator.php</exclude-pattern>
+        <exclude-pattern>tests/Cases/OpenApi/Schema/ExamplesTest.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Classes.SuperfluousErrorNaming">
+        <exclude-pattern>src/Core/Dispatcher/DispatchError.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Classes.ClassFileName.NoMatch">
+        <exclude-pattern>*tests/Cases/*</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName.NoMatchBetweenTypeNameAndFileName">
+        <exclude-pattern>*tests/Cases/*</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.PartialUse">
+        <exclude-pattern>tests</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
+        <exclude-pattern>tests</exclude-pattern>
+    </rule>
+
+    <!-- Exclude folders -->
+    <exclude-pattern>/tests/tmp</exclude-pattern>
+</ruleset>

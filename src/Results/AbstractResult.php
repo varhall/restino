@@ -11,9 +11,13 @@ abstract class AbstractResult implements IResult
         $this->mappers[] = $mapper;
     }
 
-    protected function serialize(mixed $item): mixed
+    protected function serialize(mixed $item, bool $useMappers = true): mixed
     {
         $result = $this->serializeItem($item);
+
+        if (!$useMappers) {
+            return $result;
+        }
 
         foreach ($this->mappers as $mapper) {
             $result = $mapper($result, $item);
@@ -38,10 +42,10 @@ abstract class AbstractResult implements IResult
             return $data->toArray();
 
         } else if ($data instanceof \Traversable) {
-            return array_map(fn($item) => $this->serialize($item), iterator_to_array($data));
+            return array_map(fn($item) => $this->serialize($item, useMappers: false), iterator_to_array($data));
 
         } else if (is_array($data)) {
-            return array_map(fn($item) => $this->serialize($item), $data);
+            return array_map(fn($item) => $this->serialize($item, useMappers: false), $data);
 
         } else if (is_object($data)) {
             return json_decode(json_encode($data), true);

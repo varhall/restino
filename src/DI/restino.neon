@@ -1,8 +1,16 @@
 services:
 	restino.mapping: Varhall\Restino\Mapping\MappingService
-	restino.actionrouter: Varhall\Restino\Router\ActionRouter
-	restino.middlewares.chain: Varhall\Restino\Middlewares\Chain
-	restino.middlewares.factory: Varhall\Restino\Middlewares\Factory
-	#restino.middlewares.cors: Varhall\Restino\Middlewares\CorsMiddleware
-	#restino.middlewares.authentication: Varhall\Restino\Middlewares\AuthenticationMiddleware
+	restino.filters.chain: Varhall\Restino\Filters\Chain
+
+	restino.controller.factory: Varhall\Restino\Controllers\ControllerFactory(factory: @application.presenterFactory)
+	restino.controller.action: Varhall\Restino\Controllers\ActionFactory
+
+	restino.dispatcher: Varhall\Restino\Application\Dispatcher
+
+	restino.schema.generator: Varhall\Restino\Schema\SchemaGenerator
+
+	# Nette application modifications
+	application.presenterFactory:
+		autowired: false
+		alteration: true
 

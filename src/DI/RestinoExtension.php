@@ -5,14 +5,14 @@ namespace Varhall\Restino\DI;
 use Nette\DI\CompilerExtension;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use Varhall\Restino\Middlewares\Chain;
+use Varhall\Restino\Filters\Chain;
 
 class RestinoExtension extends CompilerExtension
 {
     public function getConfigSchema(): Schema
     {
         return Expect::structure([
-            'middlewares' => Expect::arrayOf(Expect::string(), Expect::string())
+            'filters' => Expect::arrayOf(Expect::string(), Expect::string())
         ]);
     }
 
@@ -28,8 +28,8 @@ class RestinoExtension extends CompilerExtension
         $container = $this->getContainerBuilder();
         $chain = $container->getDefinitionByType(Chain::class);
 
-        foreach ($this->config->middlewares as $name => $middleware) {
-            $chain->addSetup('add', [ $name, $middleware ]);
+        foreach ($this->config->filters as $name => $filter) {
+            $chain->addSetup('add', [ $name, $filter ]);
         }
     }
 }

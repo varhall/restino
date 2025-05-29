@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../../bootstrap.php';
+
+use Contributte\Tester\Toolkit;
+use Tester\Assert;
+use Varhall\Restino\Filters\Closure;
+use Varhall\Restino\Results\Result;
+use Varhall\Restino\Filters\Context;
+
+
+Toolkit::test(function (): void {
+    $func = function(Context $request, callable $next) {
+        return $next($request);
+    };
+
+    $filter = new Closure($func);
+
+    $result = $filter->execute(mock(Context::class), fn($x) => new Result(1));
+
+    Assert::equal(1, $result->getData());
+}, 'Closure executes and passes through');

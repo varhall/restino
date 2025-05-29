@@ -1,44 +1,75 @@
 # Restino
 
-Restino is REST API framework for Nette Framework. It is based on standard Nette Presenters and tries
-to make REST API development simple. It provides many features bundled in one package but also allows
-to extend it with your own features.
+Restino is REST API framework for Nette Framework. It is based on Nette Application and tries
+to make REST API development super simple. It provides many features bundled in one package but 
+also allows you to extend it with your own features.
+
+## Installation
+
+To install Restino, you can use Composer. Run the following command in your terminal:
+
+    composer require varhall/restino
 
 ## Setup
 
-Enable Restino extension in config.neon file. You can also globally enable some bundled middlewares.
+Enable Restino extension in config.neon file. You can also globally enable some bundled filters.
 
     extensions:
         restino: Varhall\Restino\DI\RestinoExtension
 
     restino:
-        middlewares:
-            cors: Varhall\Restino\Middlewares\Operations\CorsMiddleware
-            collection: Varhall\Restino\Middlewares\Operations\CollectionMiddleware
-            filter: Varhall\Restino\Middlewares\Operations\FilterMiddleware
+        filters:
+            cors: Varhall\Restino\Filters\Cors
+		    collection: Varhall\Restino\Filters\Collection
+		    filter: Varhall\Restino\Filters\Filter
 
 ## Usage
 
 ### Routing
 
-At first, it is necessary to define routes for your API. You can use standard Nette routing but with `RestRoute`.
+At first, it is necessary to define routes for your API. Router `AttributeRouter` searches for controllers.
+`Schema` object stores all the information about your API endpoints, such as HTTP methods, paths, parameters, etc.
+You can generate `Schema` object using `SchemaGenerator` from PHP attributes.
 
-    $router[] = new RestRoute('api/<presenter>');
+    namespace App\Router;
+
+    use Nette\Application\Routers\RouteList;
+    use Varhall\Restino\Router\ApiRouter;
+    use Varhall\Restino\Schema\SchemaGenerator;
+
+    final class RouterFactory
+    {
+        public function __construct(private SchemaGenerator $schema)
+        {
+        }
+        
+        public function create(): RouteList
+        {
+            $router = new RouteList();
+    
+            $router[] = new ApiRouter($this->schema->getSchema());
+    
+            return $router;
+        }
+    }
 
 ### Presenters
 
-The endpoint of your API is represented by presenter. Bascially it is Nette presenter.
+The endpoint of your API is represented by controller. In combination with `SchemaGenerator` PHP attributes
+are needed to define the endpoint. The controller must implement `IController` interface.
 
     <?php
 
     namespace App\Presenters;
 
     use App\Models\User;
-    use Varhall\Restino\Controllers\RestController;
+    use Varhall\Restino\Controllers\IController;
     use Varhall\Utilino\Collections\ICollection;
 
-    class UsersPresenter extends RestController
+    #[Path('/api/users')]
+    class UsersController implements IController
     {
+        #[Get('/')]
         public function index(): ICollection
         {
             return User::all();
@@ -48,8 +79,8 @@ The endpoint of your API is represented by presenter. Bascially it is Nette pres
 
 # More information
 
-To learn more about Dbino, check out the following topics:
+To learn more about Restino, check out the following topics:
 
 - [Endpoints](endpoints.md) - Definition of API endpoints
-- [Middlewares](middlewares.md) - Definition of API middlewares
+- [Filters](filters.md) - Definition of API filters
 
