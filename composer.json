@@ -26,7 +26,7 @@
 	},
 
 	"require-dev": {
-		"contributte/tester": "^v0.4",
+		"ninjify/nunjuck": "^v0.4",
 		"mockery/mockery": "^1.6"
 	},
 

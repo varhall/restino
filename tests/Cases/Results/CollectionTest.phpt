@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../bootstrap.php';
 
-use Contributte\Tester\Toolkit;
+use Ninjify\Nunjuck\Toolkit;
 use Nette\Http\IResponse;
 use Nette\Database\Table\Selection;
 use Tester\Assert;

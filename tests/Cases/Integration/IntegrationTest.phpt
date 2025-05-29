@@ -5,7 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/../../bootstrap.php';
 
 use App\Presenters\UserInput;
-use Contributte\Tester\Toolkit;
+use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Controllers\Action;
 use Varhall\Restino\Controllers\Attributes\Get;

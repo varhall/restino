@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Contributte\Tester\Toolkit;
+use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Filters\Collection;
 use Varhall\Restino\Results\CollectionResult;

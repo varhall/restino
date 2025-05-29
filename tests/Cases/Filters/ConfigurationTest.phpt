@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../bootstrap.php';
 
-use Contributte\Tester\Toolkit;
+use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Filters\Configuration;
 use Varhall\Restino\Filters\IFilter;

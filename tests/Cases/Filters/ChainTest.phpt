@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../bootstrap.php';
 
-use Contributte\Tester\Toolkit;
+use Ninjify\Nunjuck\Toolkit;
 use Nette\InvalidArgumentException;
 use Tester\Assert;
 use Varhall\Restino\Filters\Chain;
