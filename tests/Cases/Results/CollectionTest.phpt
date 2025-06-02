@@ -6,88 +6,68 @@ require __DIR__ . '/../../bootstrap.php';
 
 use Ninjify\Nunjuck\Toolkit;
 use Nette\Http\IResponse;
+use Nette\Http\IRequest;
 use Nette\Database\Table\Selection;
 use Tester\Assert;
 use Varhall\Restino\Results\CollectionResult;
-use Varhall\Restino\Results\Result;
 use Varhall\Utilino\Collections\ArrayCollection;
 
+/// Test functions
+
+function response(int $limit, int $offset, int $total, ?int $next, ?int $previous): IResponse
+{
+    $response = mock(IResponse::class);
+    $response->shouldReceive('setHeader')->times(1)->with('X-Limit', $limit)->andReturnSelf();
+    $response->shouldReceive('setHeader')->times(2)->with('X-Offset', $offset)->andReturnSelf();
+    $response->shouldReceive('setHeader')->times(3)->with('X-Total', $total)->andReturnSelf();
+    $response->shouldReceive('setHeader')->times(4)->with('X-Next-Offset', $next ?? '')->andReturnSelf();
+    $response->shouldReceive('setHeader')->times(5)->with('X-Previous-Offset', $previous ?? '')->andReturnSelf();
+
+    return $response;
+}
+
+
+/// Test Cases
+
+// 1st page
 Toolkit::test(function (): void {
     $data = ArrayCollection::range(1, 10);
 
+    $response = response(3, 2, 10, 5, null);
+
     $result = new CollectionResult($data);
     $result->paginate(3, 2);
-    $test = $result->execute(mock(IResponse::class));
+    $test = $result->execute($response, mock(IRequest::class));
 
-    $expect = [
-        'pagination' => [
-            'limit'         => 3,
-            'offset'        => [
-                'current'       => 2,
-                'next'          => 5,
-                'previous'      => null
-            ],
-            'total'         => 10,
-        ],
-        'results'   => [ 3, 4, 5 ]
-    ];
-
-    Assert::equal($expect, $test);
+    Assert::equal([ 3, 4, 5 ], $test);
 }, 'testPaginate_structure');
 
-
+// 2nd page
 Toolkit::test(function (): void {
     $data = ArrayCollection::range(1, 10);
+
+    $response = response(3, 5, 10, 8, 2);
+
     $result = new CollectionResult($data);
+    $result->paginate(3, 5);
+    $test = $result->execute($response, mock(IRequest::class));
 
-    // 1st page
-    $result->paginate(3, 2);
-    $test = $result->execute(mock(IResponse::class));
-    Assert::equal(2, $test['pagination']['offset']['current']);
-    Assert::equal([ 3, 4, 5 ],  $test['results']);
+    Assert::equal([ 6, 7, 8 ], $test);
+}, 'testPaginate_structure');
 
-    // 2nd page
-    $result = new CollectionResult($data);
-    $result->paginate($test['pagination']['limit'], $test['pagination']['offset']['next']);
-    $test = $result->execute(mock(IResponse::class));
-    Assert::equal(5, $test['pagination']['offset']['current']);
-    Assert::equal([ 6, 7, 8 ],  $test['results']);
-
-    // 3rd page
-    $result = new CollectionResult($data);
-    $result->paginate($test['pagination']['limit'], $test['pagination']['offset']['next']);
-    $test = $result->execute(mock(IResponse::class));
-    Assert::equal(8, $test['pagination']['offset']['current']);
-    Assert::equal([ 9, 10 ],  $test['results']);
-    Assert::null($test['pagination']['offset']['next']);
-}, 'testPagination_Next');
-
-
+// 3rd page
 Toolkit::test(function (): void {
     $data = ArrayCollection::range(1, 10);
-    $result = new CollectionResult($data);
 
-    // 1st page
+    $response = response(3, 8, 10, null, 5);
+
+    $result = new CollectionResult($data);
     $result->paginate(3, 8);
-    $test = $result->execute(mock(IResponse::class));
-    Assert::equal(8, $test['pagination']['offset']['current']);
-    Assert::equal([ 9, 10 ],  $test['results']);
+    $test = $result->execute($response, mock(IRequest::class));
 
-    // 2nd page
-    $result = new CollectionResult($data);
-    $result->paginate($test['pagination']['limit'], $test['pagination']['offset']['previous']);
-    $test = $result->execute(mock(IResponse::class));
-    Assert::equal(5, $test['pagination']['offset']['current']);
-    Assert::equal([ 6, 7, 8 ],  $test['results']);
+    Assert::equal([ 9, 10 ], $test);
+}, 'testPaginate_structure');
 
-    // 3rd page
-    $result = new CollectionResult($data);
-    $result->paginate($test['pagination']['limit'], $test['pagination']['offset']['previous']);
-    $test = $result->execute(mock(IResponse::class));
-    Assert::equal(2, $test['pagination']['offset']['current']);
-    Assert::equal([ 3, 4, 5 ],  $test['results']);
-    Assert::null($test['pagination']['offset']['previous']);
-}, 'testPagination_Previous');
 
 
 Toolkit::test(function (): void {
@@ -98,10 +78,12 @@ Toolkit::test(function (): void {
     $data->shouldReceive('count')->andReturn(10);
 
     $result = new CollectionResult($data);
-    $result->addOrder('foo', false);
-    $result->addOrder('bar', true);
+    $result->order('foo', false);
+    $result->order('bar', true);
 
-    $test = $result->execute(mock(IResponse::class));
+    $response = response(CollectionResult::DEFAULT_LIMIT, CollectionResult::DEFAULT_OFFSET, 10, null, null);
+
+    $test = $result->execute($response, mock(IRequest::class));
 
     Assert::type('array', $test);
 }, 'testOrder');
@@ -111,7 +93,7 @@ Toolkit::test(function (): void {
     $mapper = function($a, $b) {};
     $data = ArrayCollection::range(1, 10);
 
-    $core = new Result($data);
+    $core = new CollectionResult($data);
     $core->addMapper($mapper);
 
     $result = CollectionResult::fromResult($core);

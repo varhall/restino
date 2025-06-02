@@ -9,7 +9,6 @@ use Nette\Security\User;
 use Tester\Assert;
 use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Filters\Secured;
-use Varhall\Restino\Results\Result;
 use Varhall\Restino\Results\Termination;
 
 // TODO: mock problem

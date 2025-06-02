@@ -7,7 +7,7 @@ require __DIR__ . '/../../bootstrap.php';
 use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Filters\Closure;
-use Varhall\Restino\Results\Result;
+use Varhall\Restino\Results\SimpleResult;
 use Varhall\Restino\Filters\Context;
 
 
@@ -18,7 +18,7 @@ Toolkit::test(function (): void {
 
     $filter = new Closure($func);
 
-    $result = $filter->execute(mock(Context::class), fn($x) => new Result(1));
+    $result = $filter->execute(mock(Context::class), fn($x) => new SimpleResult(1));
 
     Assert::equal(1, $result->getData());
 }, 'Closure executes and passes through');

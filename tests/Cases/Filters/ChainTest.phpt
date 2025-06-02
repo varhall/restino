@@ -11,7 +11,7 @@ use Varhall\Restino\Filters\Chain;
 use Varhall\Restino\Filters\Configuration;
 use Varhall\Restino\Filters\Closure;
 use Varhall\Restino\Filters\Collection;
-use Varhall\Restino\Results\Result;
+use Varhall\Restino\Results\SimpleResult;
 use Varhall\Restino\Filters\Context;
 
 
@@ -90,12 +90,12 @@ Toolkit::test(function (): void {
 
 Toolkit::test(function (): void {
     $manager = new Chain();
-    $fn = fn($x, $n) => new Result($n($x)->getData() + 1);
+    $fn = fn($x, $n) => new SimpleResult($n($x)->getData() + 1);
 
     $manager->add('fn1', $fn);
     $manager->add('fn2', $fn);
 
-    $chain = $manager->build(fn($x) => new Result(1), '');
+    $chain = $manager->build(fn($x) => new SimpleResult(1), '');
     Assert::equal(3, $chain(mock(Context::class))->getData());
 }, 'Chain: full chain');
 

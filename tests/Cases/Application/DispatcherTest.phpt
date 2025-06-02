@@ -7,7 +7,7 @@ require __DIR__ . '/../../bootstrap.php';
 use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Results\IResult;
-use Varhall\Restino\Results\Result;
+use Varhall\Restino\Results\SimpleResult;
 use Varhall\Restino\Schema\Endpoint;
 use Nette\Http\Request as HttpRequest;
 use Nette\Http\Response as HttpResponse;
@@ -28,30 +28,45 @@ class FilterAttributesController implements \Varhall\Restino\Controllers\IContro
 {
     public function global(string $name): IResult
     {
-        return new Result(['message' => "Hello, $name!"]);
+        return new SimpleResult(['message' => "Hello, $name!"]);
     }
 
     #[Secured]
     public function both(): IResult
     {
-        return new Result(['message' => 'This is a secured endpoint']);
+        return new SimpleResult(['message' => 'This is a secured endpoint']);
     }
 
     #[Role('test')]
     public function local(): IResult
     {
-        return new Result(['message' => 'This endpoint is not secured']);
+        return new SimpleResult(['message' => 'This endpoint is not secured']);
     }
 }
 
 
 /// Test cases
 
-Toolkit::test(function (): void {
+function dispatcherTest(string $actionName): \Nette\Application\Responses\JsonResponse
+{
     // fake controller
     $controller = new class implements \Varhall\Restino\Controllers\IController {
+        public function setup(): void
+        {
+
+        }
+
         public function hello(string $name): IResult {
-            return new Result(['message' => "Hello, $name!"]);
+            return new SimpleResult(['message' => "Hello, $name!"]);
+        }
+
+        #[\Varhall\Restino\Filters\Map('xxx')]
+        public function simple(string $name): string {
+            return 'hello world';
+        }
+
+        public function collection(string $name): \Varhall\Utilino\Collections\ICollection {
+            return new \Varhall\Utilino\Collections\ArrayCollection(['item1', 'item2']);
         }
     };
 
@@ -59,7 +74,7 @@ Toolkit::test(function (): void {
         path: '/hello/{name}',
         method: 'GET',
         controller: get_class($controller),
-        action: 'hello'
+        action: $actionName
     );
 
     $httpRequest = mock(HttpRequest::class);
@@ -76,10 +91,19 @@ Toolkit::test(function (): void {
             return new \Varhall\Restino\Controllers\Action($method, [ 'name' => 'foo' ]);
         });
 
-    // fake middleware chain – žádné middleware, jen přepošle volání
+    // fake middleware chain
     $filters = mock(Chain::class);
+
+    if ($actionName === 'simple') {
+        $filters->shouldReceive('add')
+            ->with('attribute__' . \Varhall\Restino\Filters\Map::class . '_4', Mockery::type(\Varhall\Restino\Filters\Map::class))
+            ->andReturnUsing(function ($name, $instance) {
+                return mock(\Varhall\Restino\Filters\Configuration::class);
+            });
+    }
+
     $filters->shouldReceive('build')
-        ->with(Mockery::type('callable'), 'hello')
+        ->with(Mockery::type('callable'), $actionName)
         ->andReturnUsing(fn($callback) => $callback);
 
     // dispatcher
@@ -91,7 +115,6 @@ Toolkit::test(function (): void {
         $filters
     );
 
-    // simuluje Application Request
     $request = new Request(
         name: 'Restino:' . get_class($controller),
         method: 'GET',
@@ -101,11 +124,29 @@ Toolkit::test(function (): void {
         ]
     );
 
-    /** @var Response $response */
-    $response = $dispatcher->run($request);
+    return $dispatcher->run($request);
+}
+
+
+Toolkit::test(function (): void {
+    $response = dispatcherTest('hello');
 
     Assert::type(\Nette\Application\Response::class, $response);
 }, 'Dispatcher: dispatcher run');
+
+Toolkit::test(function (): void {
+    $response = dispatcherTest('simple');
+
+    Assert::equal('hello world', $response->getPayload());
+}, 'Dispatcher: dispatcher run');
+
+Toolkit::test(function (): void {
+    $response = dispatcherTest('collection');
+
+    Assert::equal([ 'item1', 'item2' ], $response->getPayload());
+}, 'Dispatcher: dispatcher run');
+
+
 
 
 Toolkit::test(function (): void {
@@ -145,3 +186,32 @@ Toolkit::test(function (): void {
     }
 
 }, 'Dispatcher: dispatcher instance');
+
+
+Toolkit::test(function (): void {
+    $httpRequest = mock(HttpRequest::class);
+    $httpResponse = new HttpResponse();
+    $container = mock(Container::class);
+    $actionFactory = mock(ActionFactory::class);
+    $filters = mock(Chain::class);
+
+    $dispatcher = new Dispatcher(
+        $httpRequest,
+        $httpResponse,
+        $container,
+        $actionFactory,
+        $filters
+    );
+
+    $request = new Request(
+        name: 'Restino:' . 'xxx',
+        method: 'GET',
+        params: [
+            'name' => 'Tester'
+        ]
+    );
+
+    Assert::throws(function () use ($dispatcher, $request) {
+        $dispatcher->getEndpoint($request);
+    }, \Nette\InvalidStateException::class);
+});

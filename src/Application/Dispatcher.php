@@ -10,7 +10,9 @@ use Varhall\Restino\Filters\Context;
 use Varhall\Restino\Filters\IFilter;
 use Varhall\Restino\Filters\Chain;
 use Varhall\Restino\Results\Abort;
+use Varhall\Restino\Results\CollectionResult;
 use Varhall\Restino\Results\IResult;
+use Varhall\Restino\Results\SimpleResult;
 use Varhall\Restino\Schema\Endpoint;
 use Nette\Application\IPresenter;
 use Nette\Application\Request;
@@ -18,6 +20,7 @@ use Nette\Application\Response;
 use Nette\DI\Container;
 use Nette\Http\Request as HttpRequest;
 use Nette\Http\Response as HttpResponse;
+use Varhall\Utilino\Collections\ICollection;
 
 class Dispatcher implements IPresenter
 {
@@ -48,9 +51,9 @@ class Dispatcher implements IPresenter
         // chain attribute middlewares
 
         foreach ($this->getFilterAttributes($endpoint) as $attribute) {
-            $attribute = $attribute->newInstance();
+            $instance = $attribute->newInstance();
             $name = 'attribute__' . $attribute->getName() . '_' . $attribute->getTarget();
-            $this->filters->add($name, $attribute);
+            $this->filters->add($name, $instance);
         }
 
         // run setup
@@ -70,7 +73,8 @@ class Dispatcher implements IPresenter
                 );
 
                 // run action
-                return $action($controller);
+                $output = $action($controller);
+                return $this->createResult($output);
 
             } catch (Abort $abort) {
                 return $abort->getResult();
@@ -87,7 +91,7 @@ class Dispatcher implements IPresenter
 
         $result = $method($context);
 
-        return new JsonResponse($result->execute($this->httpResponse));
+        return new JsonResponse($result->execute($this->httpResponse, $this->httpRequest));
     }
 
     public function getEndpoint(Request $request): Endpoint
@@ -124,5 +128,17 @@ class Dispatcher implements IPresenter
 //        );
 //
 //        return array_values($attributes);
+    }
+
+    public function createResult(mixed $data): IResult
+    {
+        if ($data instanceof IResult) {
+            return $data;
+
+        } else if ($data instanceof ICollection || $data instanceof \Nette\Database\Table\Selection) {
+            return new CollectionResult($data);
+        }
+
+        return new SimpleResult($data);
     }
 }

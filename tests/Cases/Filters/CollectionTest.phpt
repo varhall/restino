@@ -7,7 +7,6 @@ use Tester\Assert;
 use Varhall\Restino\Filters\Collection;
 use Varhall\Restino\Results\CollectionResult;
 use Varhall\Restino\Results\IResult;
-use Varhall\Restino\Results\Result;
 use Varhall\Utilino\Collections\ArrayCollection;
 use Tests\Fixtures\Utils;
 use Varhall\Restino\Filters\Context;
@@ -20,7 +19,7 @@ Toolkit::test(function (): void {
     $request = Utils::prepareRequest([ '_limit'=> '3', '_offset' => 2 ]);
     $context = new Context(mock(Container::class), $request);
 
-    $processedResult = $filter->execute($context, fn($request) => new Result(ArrayCollection::range(1, 10)));
+    $processedResult = $filter->execute($context, fn($request) => new CollectionResult(ArrayCollection::range(1, 10)));
 
     Assert::type(IResult::class, $processedResult);
     Assert::type(CollectionResult::class, $processedResult);
@@ -32,7 +31,7 @@ Toolkit::test(function (): void {
     $request = Utils::prepareRequest([ '_limit'=> '3', '_offset' => 2 ]);
     $context = new Context(mock(Container::class), $request);
 
-    $result = $filter->execute($context, fn($request) => new Result(ArrayCollection::range(1, 10)));
+    $result = $filter->execute($context, fn($request) => new CollectionResult(ArrayCollection::range(1, 10)));
 
     Assert::equal(3, $result->getLimit());
     Assert::equal(2, $result->getOffset());
@@ -44,7 +43,7 @@ Toolkit::test(function (): void {
     $request = Utils::prepareRequest([ '_order' => 'foo,-bar' ]);
     $context = new Context(mock(Container::class), $request);
 
-    $result = $filter->execute($context, fn($request) => new Result(ArrayCollection::range(1, 10)));
+    $result = $filter->execute($context, fn($request) => new CollectionResult(ArrayCollection::range(1, 10)));
 
     Assert::equal(2, count($result->getOrder()));
     Assert::equal([ 'foo' => false, 'bar' => true ], $result->getOrder());

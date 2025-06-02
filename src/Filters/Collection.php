@@ -2,11 +2,9 @@
 
 namespace Varhall\Restino\Filters;
 
-use Nette\Database\Table\Selection;
 use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Results\CollectionResult;
 use Varhall\Restino\Results\IResult;
-use Varhall\Utilino\Collections\ICollection;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Collection implements IFilter
@@ -20,9 +18,7 @@ class Collection implements IFilter
     {
         $result = $next($context);
 
-        if ($result->getData() instanceof ICollection || $result->getData() instanceof Selection) {
-            $result = CollectionResult::fromResult($result);
-
+        if ($result instanceof CollectionResult) {
             $this->order($result, $context->getRequest());
             $this->paginate($result, $context->getRequest());
         }
@@ -41,7 +37,7 @@ class Collection implements IFilter
     protected function order(CollectionResult $result, RestRequest $request): void
     {
         foreach ($this->getOrderParameters($request) as $parameter) {
-            $result->addOrder($parameter->field, $parameter->desc);
+            $result->order($parameter->field, $parameter->desc);
         }
     }
 

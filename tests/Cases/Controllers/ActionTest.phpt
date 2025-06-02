@@ -7,7 +7,7 @@ require __DIR__ . '/../../bootstrap.php';
 use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Controllers\Action;
-use Varhall\Restino\Results\Result;
+use Varhall\Restino\Results\SimpleResult;
 
 /// Test classes
 
@@ -40,8 +40,7 @@ Toolkit::test(function (): void {
 
     $result = $action($controller);
 
-    Assert::type(Result::class, $result);
-    Assert::equal('result data', $result->getData());
+    Assert::equal('result data', $result);
 
     Assert::equal('test', $action->getName());
     Assert::same($method, $action->getFunction());

@@ -3,6 +3,7 @@
 namespace Varhall\Restino\Results;
 
 
+use Nette\Http\IRequest;
 use Nette\Http\IResponse;
 
 class Termination implements IResult
@@ -21,9 +22,9 @@ class Termination implements IResult
         return $this->data;
     }
 
-    public function execute(IResponse $http): mixed
+    public function execute(IResponse $response, IRequest $request): mixed
     {
-        $http->setCode($this->code);
+        $response->setCode($this->code);
         return $this->data;
     }
 }

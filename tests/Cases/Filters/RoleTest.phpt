@@ -8,7 +8,6 @@ use Ninjify\Nunjuck\Toolkit;
 use Nette\Security\User;
 use Tester\Assert;
 use Varhall\Restino\Filters\Role;
-use Varhall\Restino\Results\Result;
 use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Results\Termination;
 

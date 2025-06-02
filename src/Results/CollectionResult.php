@@ -3,6 +3,7 @@
 namespace Varhall\Restino\Results;
 
 use Nette\Database\Table\Selection;
+use Nette\Http\IRequest;
 use Nette\Http\IResponse;
 use Varhall\Dbino\Collections\Collection;
 use Varhall\Utilino\Collections\ICollection;
@@ -24,7 +25,7 @@ class CollectionResult extends AbstractResult
         $this->data = $data;
     }
 
-    public static function fromResult(Result $result): static
+    public static function fromResult( $result): static
     {
         $self = new static($result->getData());
         $self->mappers = $result->mappers;
@@ -58,15 +59,22 @@ class CollectionResult extends AbstractResult
         $this->offset = $offset ?? self::DEFAULT_OFFSET;
     }
 
-    public function addOrder(string $column, bool $desc = false): void
+    public function order(string $column, bool $desc = false): void
     {
         $this->order[$column] = $desc;
     }
 
-    public function execute(IResponse $http): mixed
+    public function execute(IResponse $response, IRequest $request): mixed
     {
         // paginate first
         $pagination = $this->pagination();
+
+        $response->setHeader('X-Limit', $pagination->getLimit())
+            ->setHeader('X-Offset', $pagination->getOffset())
+            ->setHeader('X-Total', $pagination->getTotal())
+            ->setHeader('X-Next-Offset', $pagination->getNextOffset() ?? '')
+            ->setHeader('X-Previous-Offset', $pagination->getPreviousOffset() ?? '');
+        
 
         // execute collection
         $this->data = $this->data->limit($this->limit, $this->offset);
@@ -84,13 +92,10 @@ class CollectionResult extends AbstractResult
             $results[] = $this->serialize($item);
         }
 
-        return [
-            'pagination'    => $pagination,
-            'results'       => $results
-        ];
+        return $results;
     }
 
-    protected function pagination(): array
+    public function pagination(): Pagination
     {
         $limit = $this->limit;
         $offset = $this->offset;
@@ -98,18 +103,10 @@ class CollectionResult extends AbstractResult
         $original = clone $this->getData();
         $total = ($original instanceof Selection) ? $original->count('*') : $original->count();
 
-        return [
-            'limit'         => $limit,
-            'offset'        => [
-                'current'       => $offset,
-                'next'          => $limit && $offset < $total - $limit
-                    ? ($offset + $limit)
-                    : null,
-                'previous'      => $limit && $offset >= $limit
-                    ? $offset - $limit
-                    : null,
-            ],
-            'total'         => $total,
-        ];
+        return new Pagination(
+            min($limit ?? self::DEFAULT_LIMIT, self::MAX_LIMIT),
+            $offset ?? self::DEFAULT_OFFSET,
+            $total
+        );
     }
 }

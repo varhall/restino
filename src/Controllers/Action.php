@@ -31,8 +31,8 @@ class Action
         return $this->parameters;
     }
 
-    public function __invoke(IController $context): IResult
+    public function __invoke(IController $context): mixed
     {
-        return new Result($this->function->invokeArgs($context, $this->parameters));
+        return $this->function->invokeArgs($context, $this->parameters);
     }
 }

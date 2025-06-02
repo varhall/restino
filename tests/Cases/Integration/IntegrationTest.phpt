@@ -10,7 +10,6 @@ use Tester\Assert;
 use Varhall\Restino\Controllers\Action;
 use Varhall\Restino\Controllers\Attributes\Get;
 use Varhall\Restino\Controllers\Attributes\Post;
-use Varhall\Restino\Results\Result;
 use Varhall\Utilino\Collections\ICollection;
 
 /// Test classes

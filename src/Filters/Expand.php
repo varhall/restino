@@ -4,27 +4,14 @@ namespace Varhall\Restino\Filters;
 
 use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Results\AbstractResult;
+use Varhall\Restino\Results\IExpandable;
 use Varhall\Restino\Results\IResult;
+use Varhall\Restino\Results\Serializer;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Expand implements IFilter
 {
     const QUERY_PARAMETER = '_expand';
-
-    protected array $rules;
-
-    public function __construct(array $rules)
-    {
-        foreach ($rules as $property => $rule) {
-            if (is_int($property) && is_string($rule)) {    // allow simplified rule ['prop' => 'prop'] as ['prop']
-                $rules[$rule] = $rule;
-                unset($rules[$property]);
-            }
-        }
-
-        $this->rules = $rules;
-    }
-
 
     public function execute(Context $context, callable $next): IResult
     {
@@ -32,33 +19,42 @@ class Expand implements IFilter
 
         if ($result instanceof AbstractResult) {
             $query = $this->requestedRules($context->getRequest());
-            $result->addMapper(fn($result, $item) => $this->map($result, $item, $query));
+            $result->addMapper(function($item) use ($query) {
+                if (!$item instanceof IExpandable) {
+                    return $item;
+                }
+
+                return $this->map($item, $query);
+            });
         }
 
         return $result;
     }
 
-    public function getRules(): array
+    public function map(IExpandable $object, array $query): mixed
     {
-        return $this->rules;
-    }
+        $rules = $object->expansions();
 
-    protected function map(mixed $result, mixed $object, array $query): mixed
-    {
-        if (!is_array($result)) {
-            return $result;
+        foreach ($rules as $property => $rule) {
+            if (is_int($property) && is_string($rule)) {    // allow simplified rule ['prop' => 'prop'] as ['prop']
+                $rules[$rule] = $rule;
+                unset($rules[$property]);
+            }
         }
 
+        $serializer = new Serializer();
+        $result = $serializer->serialize($object);
+
         foreach ($query as $property) {
-            if (array_key_exists($property, $this->rules)) {
-                $result[$property] = $this->expand($object, $this->rules[$property]);
+            if (is_array($result) && array_key_exists($property, $rules)) {
+                $result[$property] = $this->expand($object, $rules[$property]);
             }
         }
 
         return $result;
     }
 
-    protected function expand(mixed $object, string|callable $rule): mixed
+    public function expand(mixed $object, string|callable $rule): mixed
     {
         if (is_callable($rule)) {
             return $rule($object);
@@ -71,7 +67,7 @@ class Expand implements IFilter
         return null;
     }
 
-    protected function requestedRules(RestRequest $request): array
+    public function requestedRules(RestRequest $request): array
     {
         $expand = $request->getParameter(self::QUERY_PARAMETER, '');
         return array_map('trim', explode(',', $expand));

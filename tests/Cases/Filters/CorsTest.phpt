@@ -7,7 +7,7 @@ require __DIR__ . '/../../bootstrap.php';
 use Ninjify\Nunjuck\Toolkit;
 use Tester\Assert;
 use Varhall\Restino\Filters\Cors;
-use Varhall\Restino\Results\Result;
+use Varhall\Restino\Results\SimpleResult;
 use Varhall\Restino\Results\Termination;
 use Nette\Http\IResponse;
 use Tests\Fixtures\Utils;
@@ -29,7 +29,7 @@ Toolkit::test(function (): void {
 
     $filter = new Cors();
 
-    $result = $filter->execute($context, fn($x) => new Result(1));
+    $result = $filter->execute($context, fn($x) => new SimpleResult(1));
 
     Assert::type(Termination::class, $result);
 }, 'testExecute');
@@ -49,9 +49,9 @@ Toolkit::test(function (): void {
 
     $filter = new Cors();
 
-    $result = $filter->execute($context, fn($x) => new Result(1));
+    $result = $filter->execute($context, fn($x) => new SimpleResult(1));
 
-    Assert::type(Result::class, $result);
+    Assert::type(SimpleResult::class, $result);
 }, 'testNext');
 
 
