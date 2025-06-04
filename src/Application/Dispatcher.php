@@ -9,10 +9,12 @@ use Varhall\Restino\Controllers\RestRequest;
 use Varhall\Restino\Filters\Context;
 use Varhall\Restino\Filters\IFilter;
 use Varhall\Restino\Filters\Chain;
+use Varhall\Restino\Mapping\ValidationException;
 use Varhall\Restino\Results\Abort;
 use Varhall\Restino\Results\CollectionResult;
 use Varhall\Restino\Results\IResult;
 use Varhall\Restino\Results\SimpleResult;
+use Varhall\Restino\Results\Termination;
 use Varhall\Restino\Schema\Endpoint;
 use Nette\Application\IPresenter;
 use Nette\Application\Request;
@@ -75,6 +77,9 @@ class Dispatcher implements IPresenter
                 // run action
                 $output = $action($controller);
                 return $this->createResult($output);
+
+            } catch (ValidationException $ex) {
+                return new Termination($ex->errors);
 
             } catch (Abort $abort) {
                 return $abort->getResult();

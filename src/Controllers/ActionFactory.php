@@ -24,7 +24,10 @@ class ActionFactory
             try {
                 $parameters[] = $this->mapping->process(new Target($parameter), $request);
             } catch (\Nette\Schema\ValidationException $ex) {
-                $errors = array_merge($errors, $ex->getMessageObjects());
+                foreach ($ex->getMessageObjects() as $message) {
+                    array_unshift($message->path, $parameter->getName());
+                    $errors[] = $message;
+                }
             }
         }
 

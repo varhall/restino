@@ -20,6 +20,19 @@ class DummyClass
     public function exampleMethod(string $foo, int $bar)
     {
     }
+
+    public function exampleObjectMethod(DummyObject $dummy, string $baz)
+    {
+
+    }
+}
+
+class DummyObject
+{
+    public string $foo;
+
+    #[\Varhall\Utilino\Mapping\Attributes\Required]
+    public int $bar;
 }
 
 
@@ -44,7 +57,6 @@ Toolkit::test(function (): void {
 }, 'testCreate_success');
 
 
-
 Toolkit::test(function (): void {
     $mapping = mock(MappingService::class);
     $mapping->shouldReceive('process')->andThrow(new \Nette\Schema\ValidationException('',
@@ -59,6 +71,40 @@ Toolkit::test(function (): void {
     Assert::throws(function () use ($factory, $method, $request) {
         $factory->create($method, $request);
     }, ValidationException::class);
+}, 'testCreate_validationException');
+
+
+Toolkit::test(function (): void {
+    $factory = new ActionFactory(new MappingService());
+    $request = mock(RestRequest::class);
+    $request->shouldReceive('getParameters')->andReturn(['hello' => 'world', 'bar' => 'xxx']);
+    $method = new ReflectionMethod(DummyClass::class, 'exampleMethod');
+
+    try {
+        $factory->create($method, $request);
+        Assert::fail('Expected ValidationException not thrown');
+
+    } catch (ValidationException $ex) {
+        Assert::hasKey('bar', $ex->errors);
+        Assert::hasKey('foo', $ex->errors);
+    }
+}, 'testCreate_validationException');
+
+
+Toolkit::test(function (): void {
+    $factory = new ActionFactory(new MappingService());
+    $request = mock(RestRequest::class);
+    $request->shouldReceive('getParameters')->andReturn([ 'foo' => 'xxx' ]);
+    $method = new ReflectionMethod(DummyClass::class, 'exampleObjectMethod');
+
+    try {
+        $factory->create($method, $request);
+        Assert::fail('Expected ValidationException not thrown');
+
+    } catch (ValidationException $ex) {
+        Assert::hasKey('dummy.bar', $ex->errors);
+        Assert::hasKey('baz', $ex->errors);
+    }
 }, 'testCreate_validationException');
 
 
