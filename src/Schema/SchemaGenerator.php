@@ -21,6 +21,7 @@ class SchemaGenerator
 
     public function getSchema(): Schema
     {
+        $map = [];
         $groups = [];
 
         foreach ($this->controllers as $controller) {
@@ -47,6 +48,15 @@ class SchemaGenerator
                         $method->getName()
                     );
 
+                    $hash = $this->getHash($endpoint);
+                    if (isset($map[$hash])) {
+                        throw new \Nette\InvalidStateException(
+                            "Duplicate endpoint detected: [{$endpoint->method}] {$endpoint->path} ({$endpoint->controller}::{$endpoint->action})"
+                            . "and [{$map[$hash]->method}] {$map[$hash]->path} ({$map[$hash]->controller}::{$map[$hash]->action})");
+                    }
+
+                    $map[$hash] = $endpoint;
+
                     $group->add($endpoint);
 
                     break;
@@ -57,5 +67,11 @@ class SchemaGenerator
         }
 
         return new Schema($groups);
+    }
+
+    protected function getHash(Endpoint $endpoint): string
+    {
+        $path = preg_replace('#\{.+?\}#', '*', $endpoint->path);
+        return md5("[{$endpoint->method}] {$path}");
     }
 }

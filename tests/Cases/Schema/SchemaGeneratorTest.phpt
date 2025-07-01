@@ -56,6 +56,23 @@ class NopathController implements \Varhall\Restino\Controllers\IController
     public function list() {}
 }
 
+#[Path('/users')]
+class DuplicateController implements \Varhall\Restino\Controllers\IController
+{
+    #[Get('/{id}')]
+    public function foo(int $id) {}
+}
+
+#[Path('/users')]
+class NonDuplicateController implements \Varhall\Restino\Controllers\IController
+{
+    #[Post('/info')]
+    public function foo(int $id) {}
+
+    #[Get('/{id}/nested')]
+    public function nested(int $id) {}
+}
+
 
 /// Test cases
 
@@ -104,3 +121,18 @@ Toolkit::test(function (): void {
     Assert::count(0, $schema->groups); // No groups should be generated without Path attribute
 
 }, 'SchemaGenerator does not generate schema for controllers without Path attribute.');
+
+Toolkit::test(function (): void {
+    $generator = new SchemaGenerator([new DummyController(), new DuplicateController()]);
+
+    Assert::throws(function() use ($generator) {
+        $generator->getSchema();
+    }, \Nette\InvalidStateException::class);
+}, 'SchemaGenerator throws exception on duplicate endpoints.');
+
+Toolkit::test(function (): void {
+    $generator = new SchemaGenerator([new DummyController(), new NonDuplicateController()]);
+
+    $results = $generator->getSchema();
+    Assert::true(count($results->groups) > 0);
+}, 'SchemaGenerator throws exception on duplicate endpoints.');
