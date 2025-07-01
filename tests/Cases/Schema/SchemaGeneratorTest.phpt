@@ -73,6 +73,16 @@ class NonDuplicateController implements \Varhall\Restino\Controllers\IController
     public function nested(int $id) {}
 }
 
+#[Path('/foo')]
+class NonDuplicatePathController implements \Varhall\Restino\Controllers\IController
+{
+    #[Post('/info')]
+    public function foo(int $id) {}
+
+    #[Get('/{id}/nested')]
+    public function nested(int $id) {}
+}
+
 
 /// Test cases
 
@@ -131,7 +141,7 @@ Toolkit::test(function (): void {
 }, 'SchemaGenerator throws exception on duplicate endpoints.');
 
 Toolkit::test(function (): void {
-    $generator = new SchemaGenerator([new DummyController(), new NonDuplicateController()]);
+    $generator = new SchemaGenerator([new DummyController(), new NonDuplicateController(), new NonDuplicatePathController() ]);
 
     $results = $generator->getSchema();
     Assert::true(count($results->groups) > 0);

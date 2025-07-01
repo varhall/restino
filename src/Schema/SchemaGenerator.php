@@ -48,6 +48,9 @@ class SchemaGenerator
                         $method->getName()
                     );
 
+                    $group->add($endpoint);
+
+                    // check duplications
                     $hash = $this->getHash($endpoint);
                     if (isset($map[$hash])) {
                         throw new \Nette\InvalidStateException(
@@ -56,8 +59,6 @@ class SchemaGenerator
                     }
 
                     $map[$hash] = $endpoint;
-
-                    $group->add($endpoint);
 
                     break;
                 }
