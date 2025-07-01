@@ -45,7 +45,7 @@ class ApiRouter implements Router
 
     public function constructUrl(array $params, UrlScript $refUrl): ?string
     {
-        throw new NotSupportedException('constructUrl is not supported in AttributeRouter. Use matchEndpoint instead.');
+        return null;
     }
 
     protected function matchEndpoint(string $path, string $method, Endpoint $endpoint): ?array

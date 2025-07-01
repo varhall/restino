@@ -72,8 +72,6 @@ Toolkit::test(function (): void {
     $schema = new Schema([]);
     $router = new ApiRouter($schema);
 
-    Assert::throws(function () use ($router) {
-        $router->constructUrl([], new UrlScript('https://example.com', '/'));
-    }, \Nette\NotSupportedException::class);
-
+    $result = $router->constructUrl([], new UrlScript('https://example.com', '/'));
+    Assert::null($result);
 }, 'ApiRouter: constructUrl vyhodí výjimku');
