@@ -20,8 +20,8 @@ Enable Restino extension in config.neon file. You can also globally enable some 
     restino:
         filters:
             cors: Varhall\Restino\Filters\Cors
-		    collection: Varhall\Restino\Filters\Collection
-		    filter: Varhall\Restino\Filters\Filter
+            collection: Varhall\Restino\Filters\Collection
+            filter: Varhall\Restino\Filters\Filter
 
 ## Usage
 
@@ -53,7 +53,7 @@ You can generate `Schema` object using `SchemaGenerator` from PHP attributes.
         }
     }
 
-### Presenters
+### Controllers
 
 The endpoint of your API is represented by controller. In combination with `SchemaGenerator` PHP attributes
 are needed to define the endpoint. The controller must implement `IController` interface.

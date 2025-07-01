@@ -1,6 +1,7 @@
 # Endpoints
 
 - [Controller definition](#controller-definition)
+  - [Controller DI registration](#controller-di) 
 - [Routing](#routing)
 - [Schema generator](#schema-generator)
 - [Input parameters](#input-parameters)
@@ -70,6 +71,26 @@ Basic definition of controller can look like:
         }
     }
 
+<a name="controller-di"></a>
+### Controller DI registration
+
+Controller should be registered in Nette DI container. The controller can be registered as service manually or using
+automatic registration in `config.neon`:
+
+    search:
+        -
+            in: %appDir%
+            classes:
+                - *Controller
+
+    decorator:
+        Varhall\Restino\Controllers\IController:
+            inject: true
+
+
+This causes all classes implementing `IController` interface to be automatically registered as services in 
+Nette DI container and special methods `inject*` are called. It is very useful for using trait partial functions.
+
 <a name="routing"></a>
 ## Routing
 
@@ -103,6 +124,13 @@ The example of possible `RouterFactory` can look like this:
             return $router;
         }
     }
+
+Because of `SchemaGenerator` is used in `RouterFactory` create method cannot be static. Service registration
+in `config.neon` can look like this:
+
+    services:
+        - App\Router\RouterFactory
+        - @App\Router\RouterFactory::create
 
 <a name="schema-generator"></a>
 ## Schema generator
