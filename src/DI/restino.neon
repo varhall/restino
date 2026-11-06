@@ -6,11 +6,12 @@ services:
 	restino.controller.action: Varhall\Restino\Controllers\ActionFactory
 
 	restino.dispatcher: Varhall\Restino\Application\Dispatcher
+	restino.serializer: Varhall\Restino\Results\Serializer
 
 	restino.schema.generator: Varhall\Restino\Schema\SchemaGenerator
+	restino.router.factory: Varhall\Restino\Router\ApiRouterFactory
 
 	# Nette application modifications
 	application.presenterFactory:
 		autowired: false
 		alteration: true
-

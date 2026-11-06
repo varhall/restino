@@ -100,6 +100,11 @@ function dispatcherTest(string $actionName): \Nette\Application\Responses\JsonRe
             ->andReturnUsing(function ($name, $instance) {
                 return mock(\Varhall\Restino\Filters\Configuration::class);
             });
+
+        // attribute filters are removed from the shared chain after the chain is built
+        $filters->shouldReceive('remove')
+            ->with('attribute__' . \Varhall\Restino\Filters\Map::class . '_4')
+            ->once();
     }
 
     $filters->shouldReceive('build')

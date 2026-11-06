@@ -25,8 +25,9 @@
 	},
 
 	"require-dev": {
+		"mockery/mockery": "^1.6",
 		"ninjify/nunjuck": "^v0.4",
-		"mockery/mockery": "^1.6"
+		"phpstan/phpstan": "^2.1"
 	},
 
 	"autoload": {

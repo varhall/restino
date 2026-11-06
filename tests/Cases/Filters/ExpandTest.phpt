@@ -193,8 +193,11 @@ Toolkit::test(function (): void {
 
     $expand->shouldReceive('map')
         ->once()
-        ->with(Mockery::type(IExpandable::class), ['foo'])
+        ->with(Mockery::type(IExpandable::class), ['foo'], Mockery::type(\Varhall\Restino\Results\Serializer::class))
         ->andReturn(['mapped' => true]);
+
+    // mapper uses serializer of the result (assigned by Dispatcher)
+    $result->shouldReceive('getSerializer')->andReturn(new \Varhall\Restino\Results\Serializer());
 
     // Ověříme, že mapper přetvoří jen IExpandable
     $result->shouldReceive('addMapper')->once()->with(Mockery::on(function ($mapper) use ($expand) {

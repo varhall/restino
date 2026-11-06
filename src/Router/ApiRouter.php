@@ -9,14 +9,18 @@ use Nette\Http\IRequest;
 use Nette\Http\UrlScript;
 use Nette\NotSupportedException;
 use Nette\Routing\Router;
+use Varhall\Restino\Versioning\ClientVersion;
 
 class ApiRouter implements Router
 {
     protected Schema $schema;
 
-    public function __construct(Schema $schema)
+    protected ?ClientVersion $clientVersion;
+
+    public function __construct(Schema $schema, ?ClientVersion $clientVersion = null)
     {
         $this->schema = $schema;
+        $this->clientVersion = $clientVersion;
     }
 
 
@@ -24,6 +28,9 @@ class ApiRouter implements Router
     {
         $path = trim($httpRequest->getUrl()->getRelativePath(), '/');
         $path = preg_replace('#/+#', '/', "/{$path}");
+
+        // router runs before filters, so it resolves the client version itself
+        $this->clientVersion?->resolve($httpRequest);
 
         foreach ($this->schema->groups as $group) {
             foreach ($group->endpoints as $endpoint) {
@@ -50,6 +57,10 @@ class ApiRouter implements Router
 
     protected function matchEndpoint(string $path, string $method, Endpoint $endpoint): ?array
     {
+        if ($this->clientVersion && !$endpoint->accepts($this->clientVersion->get())) {
+            return null;
+        }
+
         if ($endpoint->method === $method && preg_match("#^{$endpoint->getPattern()}$#", $path, $matches)) {
             return array_filter($matches, function ($key) {
                 return !is_int($key);

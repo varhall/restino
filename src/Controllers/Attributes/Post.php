@@ -5,8 +5,12 @@ namespace Varhall\Restino\Controllers\Attributes;
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class Post extends Action
 {
-    public function __construct(string $path = '/')
+    /**
+     * @param int|null $since endpoint is available for clients with version >= since
+     * @param int|null $before endpoint is available for clients with version < before
+     */
+    public function __construct(string $path = '/', ?int $since = null, ?int $before = null)
     {
-        parent::__construct('POST', $path);
+        parent::__construct('POST', $path, $since, $before);
     }
 }

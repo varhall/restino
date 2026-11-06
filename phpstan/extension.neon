@@ -1,0 +1,19 @@
+parameters:
+	restinoVersioning:
+		minimum: 1
+		current: 1
+
+parametersSchema:
+	restinoVersioning: structure([
+		minimum: int()
+		current: int()
+	])
+
+services:
+	-
+		class: Varhall\Restino\Versioning\PHPStan\ClientVersionBeforeRule
+		arguments:
+			minimum: %restinoVersioning.minimum%
+			current: %restinoVersioning.current%
+		tags:
+			- phpstan.rules.rule

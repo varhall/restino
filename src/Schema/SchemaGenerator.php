@@ -45,20 +45,24 @@ class SchemaGenerator
                         $actionAttr->path,
                         $actionAttr->method,
                         $rc->getName(),
-                        $method->getName()
+                        $method->getName(),
+                        $actionAttr->since,
+                        $actionAttr->before
                     );
 
                     $group->add($endpoint);
 
-                    // check duplications
+                    // check duplications - same method and path is allowed only for distinct version ranges
                     $hash = $this->getHash($endpoint);
-                    if (isset($map[$hash])) {
-                        throw new \Nette\InvalidStateException(
-                            "Duplicate endpoint detected: [{$endpoint->method}] {$endpoint->path} ({$endpoint->controller}::{$endpoint->action})"
-                            . "and [{$map[$hash]->method}] {$map[$hash]->path} ({$map[$hash]->controller}::{$map[$hash]->action})");
+                    foreach ($map[$hash] ?? [] as $existing) {
+                        if ($existing->overlaps($endpoint)) {
+                            throw new \Nette\InvalidStateException(
+                                "Duplicate endpoint detected: [{$endpoint->method}] {$endpoint->path} ({$endpoint->controller}::{$endpoint->action}, {$endpoint->describeRange()})"
+                                . " and [{$existing->method}] {$existing->path} ({$existing->controller}::{$existing->action}, {$existing->describeRange()})");
+                        }
                     }
 
-                    $map[$hash] = $endpoint;
+                    $map[$hash][] = $endpoint;
 
                     break;
                 }

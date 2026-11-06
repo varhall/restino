@@ -16,9 +16,19 @@ class CollectionResult extends AbstractResult
 
     protected ICollection|Selection $data;
 
-    protected int $limit        = self::DEFAULT_LIMIT;
+    /** requested page size, null = default */
+    protected ?int $limit       = null;
     protected int $offset       = self::DEFAULT_OFFSET;
     protected array $order      = [];
+
+    /** page size when no limit is requested */
+    protected int $defaultLimit = self::DEFAULT_LIMIT;
+
+    /** maximal page size, null = unlimited */
+    protected ?int $maxLimit    = self::MAX_LIMIT;
+
+    /** limits were set explicitly by setLimits() */
+    protected bool $hasLimits   = false;
 
     public function __construct(ICollection|Selection $data)
     {
@@ -30,6 +40,14 @@ class CollectionResult extends AbstractResult
         $self = new static($result->getData());
         $self->mappers = $result->mappers;
 
+        if ($result instanceof AbstractResult && $result->serializer !== null) {
+            $self->setSerializer($result->serializer);
+        }
+
+        if ($result instanceof CollectionResult && $result->hasLimits()) {
+            $self->setLimits($result->defaultLimit, $result->maxLimit);
+        }
+
         return $self;
     }
 
@@ -38,9 +56,52 @@ class CollectionResult extends AbstractResult
         return $this->data;
     }
 
+    /**
+     * Sets page size used when the client does not request any and the maximal page size (null = unlimited).
+     * Limits are applied when the result is executed, so the order of setLimits() and paginate() does not matter.
+     * Explicitly set limits take precedence over the limits from the configuration.
+     */
+    public function setLimits(int $defaultLimit, ?int $maxLimit): static
+    {
+        if ($defaultLimit < 1 || ($maxLimit !== null && $maxLimit < $defaultLimit)) {
+            throw new \Nette\InvalidArgumentException(
+                "Invalid collection limits: default {$defaultLimit} must be at least 1 and not greater than maximum " . ($maxLimit ?? 'unlimited') . '.'
+            );
+        }
+
+        $this->defaultLimit = $defaultLimit;
+        $this->maxLimit = $maxLimit;
+        $this->hasLimits = true;
+
+        return $this;
+    }
+
+    /**
+     * Limits were set explicitly
+     */
+    public function hasLimits(): bool
+    {
+        return $this->hasLimits;
+    }
+
+    public function getDefaultLimit(): int
+    {
+        return $this->defaultLimit;
+    }
+
+    public function getMaxLimit(): ?int
+    {
+        return $this->maxLimit;
+    }
+
+    /**
+     * Effective page size - requested limit (or default) capped by the maximum
+     */
     public function getLimit(): int
     {
-        return $this->limit;
+        $limit = $this->limit ?? $this->defaultLimit;
+
+        return $this->maxLimit === null ? $limit : min($limit, $this->maxLimit);
     }
 
     public function getOffset(): int
@@ -55,7 +116,7 @@ class CollectionResult extends AbstractResult
 
     public function paginate(?int $limit, ?int $offset): void
     {
-        $this->limit = min($limit ?? self::DEFAULT_LIMIT, self::MAX_LIMIT);
+        $this->limit = $limit;
         $this->offset = $offset ?? self::DEFAULT_OFFSET;
     }
 
@@ -77,7 +138,7 @@ class CollectionResult extends AbstractResult
         
 
         // execute collection
-        $this->data = $this->data->limit($this->limit, $this->offset);
+        $this->data = $this->data->limit($pagination->getLimit(), $pagination->getOffset());
 
         if ($this->data instanceof Selection || $this->data instanceof Collection) {
             foreach ($this->order as $column => $desc) {
@@ -97,16 +158,9 @@ class CollectionResult extends AbstractResult
 
     public function pagination(): Pagination
     {
-        $limit = $this->limit;
-        $offset = $this->offset;
-
         $original = clone $this->getData();
         $total = ($original instanceof Selection) ? $original->count('*') : $original->count();
 
-        return new Pagination(
-            min($limit ?? self::DEFAULT_LIMIT, self::MAX_LIMIT),
-            $offset ?? self::DEFAULT_OFFSET,
-            $total
-        );
+        return new Pagination($this->getLimit(), $this->offset, $total);
     }
 }

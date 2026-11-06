@@ -70,3 +70,20 @@ Toolkit::test(function (): void {
     Assert::true($config->canRun('create'));
     Assert::true($config->canRun('update'));
 }, 'Configuration: reset');
+
+
+Toolkit::test(function (): void {
+    $config = new Configuration(mock(IFilter::class));
+    $config->only(['index', 'get']);
+
+    Assert::true($config->canRun('index'));
+    Assert::true($config->canRun('get'));
+    Assert::false($config->canRun('create'));
+
+    $config = new Configuration(mock(IFilter::class));
+    $config->except(['index', 'get']);
+
+    Assert::false($config->canRun('index'));
+    Assert::false($config->canRun('get'));
+    Assert::true($config->canRun('create'));
+}, 'Configuration: only and except with multiple actions');

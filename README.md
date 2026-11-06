@@ -26,12 +26,18 @@ composer require varhall/restino
 
 For details on how to use this package, check out our [documentation](.docs).
 
+- [Endpoints](.docs/endpoints.md) - controllers, routing, input parameters and validation
+- [Responses](.docs/results.md) - return values, serialization, collections, status codes and errors
+- [Filters](.docs/filters.md) - middlewares for authentication, collections, expansions, CORS and more
+- [Versioning](.docs/versioning.md) - serving old and new API clients from one codebase (minimum version,
+  input and output adapters, version-based routing)
+
 ## Versions
 
 | State       | Version       | Branch   | Nette | PHP    |
 |-------------|---------------|----------|-------|--------|
-| dev         | `dev-master`  | `master` | 4.0+  | `^8.1` |
-| stable      | `^1.0`        | `v1.0`   | 4.0+  | `^8.1` |
+| dev         | `dev-master`  | `master` | 3.1+  | `^8.1` |
+| stable      | `^1.0`        | `v1.0`   | 3.1+  | `^8.1` |
 
 ## Development
 

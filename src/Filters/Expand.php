@@ -19,19 +19,24 @@ class Expand implements IFilter
 
         if ($result instanceof AbstractResult) {
             $query = $this->requestedRules($context->getRequest());
-            $result->addMapper(function($item) use ($query) {
+            $result->addMapper(function($item) use ($query, $result) {
                 if (!$item instanceof IExpandable) {
                     return $item;
                 }
 
-                return $this->map($item, $query);
+                // serializer of the result is resolved lazily - it is assigned by Dispatcher after filters
+                return $this->map($item, $query, $result->getSerializer());
             });
         }
 
         return $result;
     }
 
-    public function map(IExpandable $object, array $query): mixed
+    /**
+     * Serializes the object and adds requested expansions. Expanded values are returned unserialized,
+     * they are serialized (and downgraded) by the result serializer as standalone values.
+     */
+    public function map(IExpandable $object, array $query, ?Serializer $serializer = null): mixed
     {
         $rules = $object->expansions();
 
@@ -42,7 +47,7 @@ class Expand implements IFilter
             }
         }
 
-        $serializer = new Serializer();
+        $serializer ??= new Serializer();
         $result = $serializer->serialize($object);
 
         foreach ($query as $property) {

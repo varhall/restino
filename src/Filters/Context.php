@@ -3,7 +3,9 @@
 namespace Varhall\Restino\Filters;
 
 use Nette\DI\Container;
+use Nette\InvalidStateException;
 use Varhall\Restino\Controllers\RestRequest;
+use Varhall\Restino\Schema\Endpoint;
 
 class Context
 {
@@ -11,10 +13,13 @@ class Context
 
     protected RestRequest $request;
 
-    public function __construct(Container $container, RestRequest $request)
+    protected ?Endpoint $endpoint;
+
+    public function __construct(Container $container, RestRequest $request, ?Endpoint $endpoint = null)
     {
         $this->container = $container;
         $this->request = $request;
+        $this->endpoint = $endpoint;
     }
 
     public function getContainer(): Container
@@ -25,6 +30,17 @@ class Context
     public function getRequest(): RestRequest
     {
         return $this->request;
+    }
+
+    public function getEndpoint(): Endpoint
+    {
+        $endpoint = $this->endpoint ?? $this->request->getRequest()->getParameter('_endpoint');
+
+        if (!($endpoint instanceof Endpoint)) {
+            throw new InvalidStateException('Endpoint is not available in the filter context.');
+        }
+
+        return $endpoint;
     }
 
     public function getHttpRequest(): \Nette\Http\IRequest

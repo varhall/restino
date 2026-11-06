@@ -24,6 +24,7 @@ Toolkit::test(function (): void {
     $container = mock(Container::class);
     $container->shouldReceive('getHttpResponse')->andReturn($response);
     $container->shouldReceive('getByType')->with(\Nette\Http\IResponse::class)->andReturn($response);
+    $container->shouldReceive('findByType')->with(\Varhall\Restino\Filters\CorsHeaderProvider::class)->andReturn([]);
 
     $context = new Context($container, $request);
 
@@ -44,6 +45,7 @@ Toolkit::test(function (): void {
     $container = mock(Container::class);
     $container->shouldReceive('getHttpResponse')->andReturn($response);
     $container->shouldReceive('getByType')->with(\Nette\Http\IResponse::class)->andReturn($response);
+    $container->shouldReceive('findByType')->with(\Varhall\Restino\Filters\CorsHeaderProvider::class)->andReturn([]);
 
     $context = new Context($container, $request);
 
