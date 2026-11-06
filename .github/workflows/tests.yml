@@ -41,6 +41,21 @@ jobs:
           path: tests/**/output
 
 
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: "${{ env.extensions }}"
+          coverage: none
+
+      - run: composer install --no-progress --prefer-dist
+      - run: make phpstan
+
+
   coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
@@ -50,6 +65,7 @@ jobs:
         with:
           php-version: 8.5
           extensions: "${{ env.extensions }}"
+          coverage: xdebug
 
       - run: composer install --no-progress --prefer-dist
       - run: make coverage

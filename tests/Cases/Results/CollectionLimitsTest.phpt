@@ -18,7 +18,8 @@ use Varhall\Restino\Results\SimpleResult;
 use Varhall\Utilino\Collections\ArrayCollection;
 
 
-function collection(int $count = 3000): ArrayCollection
+// keep the data small - tests run with code coverage as well
+function collection(int $count = 300): ArrayCollection
 {
     return new ArrayCollection(range(1, $count));
 }
@@ -73,11 +74,11 @@ Toolkit::test(function (): void {
 
 
 Toolkit::test(function (): void {
-    $result = (new CollectionResult(collection()))->setLimits(10, 2000);
-    $result->paginate(2500, 0);
+    $result = (new CollectionResult(collection()))->setLimits(10, 200);
+    $result->paginate(250, 0);
 
-    Assert::same(2000, $result->getLimit());
-    Assert::count(2000, $result->execute(new \Nette\Http\Response(), mock(\Nette\Http\IRequest::class)));
+    Assert::same(200, $result->getLimit());
+    Assert::count(200, $result->execute(new \Nette\Http\Response(), mock(\Nette\Http\IRequest::class)));
 }, 'CollectionResult: configured maximum caps the requested limit');
 
 

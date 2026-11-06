@@ -50,7 +50,7 @@ class Serializer
             return array_map(fn($item) => $this->serialize($item), $data);
 
         } else if (is_object($data)) {
-            return json_decode(json_encode($data), true);
+            return json_decode((string) json_encode($data), true);
 
         }
 
@@ -78,7 +78,7 @@ class Serializer
             return array_map(fn($item) => $this->buildTree($item), $data);
 
         } else if (is_object($data)) {
-            return json_decode(json_encode($data), true);
+            return json_decode((string) json_encode($data), true);
 
         }
 

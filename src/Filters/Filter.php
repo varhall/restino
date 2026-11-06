@@ -32,9 +32,15 @@ class Filter implements IFilter
         for ($i = 0; $i < count($parameters); $i++) {
             $parameter = &$parameters[$i];
 
-            if ($parameter['operator'] == '=' && ($parameter['value'] instanceof \DateTime || preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i', $parameter['value']))) {
+            $date = null;
+
+            if ($parameter['operator'] == '=' && ($parameter['value'] instanceof \DateTime
+                    || (is_string($parameter['value']) && preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i', $parameter['value'])))) {
                 $date = ($parameter['value'] instanceof \DateTime) ? $parameter['value']->format('Y-m-d') : $parameter['value'];
-                $date = \Nette\Utils\DateTime::createFromFormat('Y-m-d', $date);
+                $date = \Nette\Utils\DateTime::createFromFormat('Y-m-d', $date) ?: null;
+            }
+
+            if ($date !== null) {
 
                 // split date to range >= date and < date + 1
                 $parameters[] = [
@@ -115,7 +121,7 @@ class Filter implements IFilter
                 }
 
                 // operator LIKE
-                if ($operator == '=' && preg_match('/\*/', $value)) {
+                if ($operator == '=' && is_string($value) && preg_match('/\*/', $value)) {
                     $value = preg_replace('/\*+/', '%', $value);
                     $operator = 'LIKE';
                 }

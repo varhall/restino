@@ -9,6 +9,25 @@ use Tester\Assert;
 
 
 /**
+ * PHP CLI binary for running PHPStan - under phpdbg (code coverage) PHP_BINARY is the debugger
+ * (and PHP_SAPI is 'cli' because Tester runs it with -S cli)
+ */
+function phpCli(): string
+{
+    if (!str_contains(basename(PHP_BINARY), 'phpdbg')) {
+        return PHP_BINARY;
+    }
+
+    foreach ([ PHP_BINDIR . '/php', dirname(PHP_BINARY) . '/php' ] as $binary) {
+        if (is_file($binary) && is_executable($binary)) {
+            return $binary;
+        }
+    }
+
+    Tester\Environment::skip('PHP CLI binary not found, PHPStan cannot be run.');
+}
+
+/**
  * Runs PHPStan with the Restino extension on the fixture and returns errors as [line => identifier]
  */
 function analyse(string $file, int $minimum, int $current): array
@@ -31,7 +50,7 @@ function analyse(string $file, int $minimum, int $current): array
 
     $command = sprintf(
         '%s %s analyse --no-progress --error-format=json --memory-limit=1G -c %s %s 2>&1',
-        escapeshellarg(PHP_BINARY),
+        escapeshellarg(phpCli()),
         escapeshellarg("{$root}/vendor/bin/phpstan"),
         escapeshellarg($config),
         escapeshellarg($file)

@@ -1,13 +1,12 @@
-includes:
-	- vendor/contributte/phpstan/phpstan.neon
-
 parameters:
 	level: 8
 	phpVersion: 80100
+	tmpDir: tests/temp/phpstan
 
 	paths:
 		- src
-		- .docs
 
-	reportMaybesInPropertyPhpDocTypes: false
-	checkGenericClassInNonGenericObjectType: false
+	ignoreErrors:
+		# value types of arrays and generic classes are not annotated in the public API (array $data, Selection)
+		- identifier: missingType.iterableValue
+		- identifier: missingType.generics

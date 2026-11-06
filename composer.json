@@ -26,8 +26,16 @@
 
 	"require-dev": {
 		"mockery/mockery": "^1.6",
+		"nette/database": "^3.2",
 		"ninjify/nunjuck": "^v0.4",
-		"phpstan/phpstan": "^2.1"
+		"phpstan/phpstan": "^2.1",
+		"varhall/dbino": "^2.0"
+	},
+
+	"suggest": {
+		"nette/database": "Collections and filtering of Nette Database selections",
+		"varhall/dbino": "Collections, ordering and filtering of Dbino models",
+		"phpstan/phpstan": "Checks of ClientVersion::before() branches (phpstan/extension.neon)"
 	},
 
 	"autoload": {

@@ -6,11 +6,11 @@ use Varhall\Restino\Results\IResult;
 
 class Closure implements IFilter
 {
-    protected $callable;
+    protected \Closure $callable;
 
     public function __construct(callable $callable)
     {
-        $this->callable = $callable;
+        $this->callable = \Closure::fromCallable($callable);
     }
 
 

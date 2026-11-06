@@ -27,7 +27,10 @@ class ControllerFactory implements IPresenterFactory
         $class = $this->getControllerClass($name);
 
         if ($class) {
-            return $this->container->getService('restino.dispatcher');
+            $dispatcher = $this->container->getService('restino.dispatcher');
+            assert($dispatcher instanceof IPresenter);
+
+            return $dispatcher;
         }
 
         return $this->factory->createPresenter($name);

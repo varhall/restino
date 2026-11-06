@@ -8,6 +8,9 @@ use Nette\Http\IResponse;
 use Varhall\Dbino\Collections\Collection;
 use Varhall\Utilino\Collections\ICollection;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CollectionResult extends AbstractResult
 {
     const DEFAULT_LIMIT     = 100;
@@ -35,12 +38,12 @@ class CollectionResult extends AbstractResult
         $this->data = $data;
     }
 
-    public static function fromResult( $result): static
+    public static function fromResult(AbstractResult $result): static
     {
         $self = new static($result->getData());
         $self->mappers = $result->mappers;
 
-        if ($result instanceof AbstractResult && $result->serializer !== null) {
+        if ($result->serializer !== null) {
             $self->setSerializer($result->serializer);
         }
 
@@ -130,11 +133,11 @@ class CollectionResult extends AbstractResult
         // paginate first
         $pagination = $this->pagination();
 
-        $response->setHeader('X-Limit', $pagination->getLimit())
-            ->setHeader('X-Offset', $pagination->getOffset())
-            ->setHeader('X-Total', $pagination->getTotal())
-            ->setHeader('X-Next-Offset', $pagination->getNextOffset() ?? '')
-            ->setHeader('X-Previous-Offset', $pagination->getPreviousOffset() ?? '');
+        $response->setHeader('X-Limit', (string) $pagination->getLimit())
+            ->setHeader('X-Offset', (string) $pagination->getOffset())
+            ->setHeader('X-Total', (string) $pagination->getTotal())
+            ->setHeader('X-Next-Offset', (string) $pagination->getNextOffset())
+            ->setHeader('X-Previous-Offset', (string) $pagination->getPreviousOffset());
         
 
         // execute collection
@@ -148,8 +151,10 @@ class CollectionResult extends AbstractResult
 
         // serialize response
         $results = [];
+        $items = $this->data;
+        assert(is_iterable($items));    // collection implementations are traversable
 
-        foreach ($this->data as $item) {
+        foreach ($items as $item) {
             $results[] = $this->serialize($item);
         }
 

@@ -152,8 +152,13 @@ class Dispatcher implements IPresenter
 
     public function createController(Endpoint $endpoint): IController
     {
-        // TODO: perhaps check base type
-        return $this->container->getByType($endpoint->controller);
+        $controller = $this->container->getByType($endpoint->controller);
+
+        if (!($controller instanceof IController)) {
+            throw new \Nette\InvalidStateException("Controller {$endpoint->controller} must implement " . IController::class . '.');
+        }
+
+        return $controller;
     }
 
     public function getFilterAttributes(Endpoint $endpoint): array

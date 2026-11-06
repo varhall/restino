@@ -148,3 +148,30 @@ Toolkit::test(function (): void {
     filterTest($query, $selection);
 }, 'Filter: excluded system parameter');
 
+
+
+Toolkit::test(function (): void {
+    $query = [
+        'name' => 'Seb*,Lars',
+    ];
+
+    // multiple values are IN condition, the wildcard is not converted to LIKE (previously TypeError)
+    $selection = Mockery::mock(Selection::class);
+    $selection->shouldReceive('where')
+        ->once()->with('name', ['Seb*', 'Lars']);
+
+    filterTest($query, $selection);
+}, 'Filter: multiple values with wildcard');
+
+
+Toolkit::test(function (): void {
+    $query = [
+        'created' => '2024-01-31',
+    ];
+
+    $selection = Mockery::mock(Selection::class);
+    $selection->shouldReceive('where')->once()->with('created >= ?', '2024-01-31');
+    $selection->shouldReceive('where')->once()->with('created < ?', '2024-02-01');
+
+    filterTest($query, $selection);
+}, 'Filter: date matches the whole day');

@@ -109,9 +109,15 @@ class Chain
             $filter = new Closure($filter);
         }
 
-        $this->filters[$name] = new Configuration(
-            ($filter instanceof IFilter) ? $filter : new $filter()
-        );
+        if (is_string($filter) && class_exists($filter)) {
+            $filter = new $filter();
+        }
+
+        if (!($filter instanceof IFilter)) {
+            throw new InvalidArgumentException("Filter {$name} must be an instance or a class name of " . IFilter::class . ' or a callable.');
+        }
+
+        $this->filters[$name] = new Configuration($filter);
 
         return $this->filters[$name];
     }

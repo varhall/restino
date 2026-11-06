@@ -27,7 +27,7 @@ class ApiRouter implements Router
     public function match(IRequest $httpRequest): ?array
     {
         $path = trim($httpRequest->getUrl()->getRelativePath(), '/');
-        $path = preg_replace('#/+#', '/', "/{$path}");
+        $path = (string) preg_replace('#/+#', '/', "/{$path}");
 
         // router runs before filters, so it resolves the client version itself
         $this->clientVersion?->resolve($httpRequest);

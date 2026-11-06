@@ -34,6 +34,16 @@
 ### Fixed
 
 - `Configuration::only()` / `except()` with a list of actions registered only the last one.
+- `Filter` with a wildcard in multiple values (`?name=a*,b`) failed with `TypeError`.
+- `Chain::add()` with an invalid filter throws `InvalidArgumentException` instead of a PHP error,
+  `Dispatcher` checks that the controller implements `IController`.
+- Pagination headers are sent as strings.
+
+### Development
+
+- PHPStan 2 (level 8) without errors: fixed configuration, `make phpstan`, PHPStan job in CI.
+- `nette/database` and `varhall/dbino` in `require-dev` (and `suggest`) - optional integrations are analysed and tested.
+- Code coverage in CI uses Xdebug instead of phpdbg.
 
 ### Documentation
 

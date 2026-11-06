@@ -12,6 +12,18 @@ use Tester\Assert;
 use Varhall\Restino\Results\CollectionResult;
 use Varhall\Utilino\Collections\ArrayCollection;
 
+/// Test classes
+
+/**
+ * Selection without database - mocked methods only (real __clone needs an initialized selection)
+ */
+class StubSelection extends Selection
+{
+    public function __clone()
+    {
+    }
+}
+
 /// Test functions
 
 function response(int $limit, int $offset, int $total, ?int $next, ?int $previous): IResponse
@@ -71,11 +83,13 @@ Toolkit::test(function (): void {
 
 
 Toolkit::test(function (): void {
-    $data = mock(Selection::class);
+    $data = mock(StubSelection::class);
     $data->shouldReceive('order')->once()->with('foo ASC')->andReturnSelf();
     $data->shouldReceive('order')->once()->with('bar DESC')->andReturnSelf();
     $data->shouldReceive('limit')->with(CollectionResult::DEFAULT_LIMIT, CollectionResult::DEFAULT_OFFSET)->andReturnSelf();
     $data->shouldReceive('count')->andReturn(10);
+    $data->shouldReceive('rewind');
+    $data->shouldReceive('valid')->andReturn(false);   // empty iteration
 
     $result = new CollectionResult($data);
     $result->order('foo', false);

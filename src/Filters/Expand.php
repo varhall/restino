@@ -65,7 +65,7 @@ class Expand implements IFilter
             return $rule($object);
         }
 
-        if (is_string($rule) && is_object($object) && method_exists($object, $rule)) {
+        if (is_object($object) && method_exists($object, $rule)) {
             return $object->$rule();
         }
 

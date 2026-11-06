@@ -64,25 +64,28 @@ class RestinoExtension extends CompilerExtension
             $this->loadFromFile(__DIR__ . '/restino.neon')['services'],
         );
 
-        $this->loadCollection($this->config->collection);
+        $config = $this->getSettings();
 
-        if ($this->config->versioning) {
-            $this->loadVersioning($this->config->versioning);
+        $this->loadCollection($config->collection);
+
+        if ($config->versioning) {
+            $this->loadVersioning($config->versioning);
         }
     }
 
     public function beforeCompile()
     {
+        $config = $this->getSettings();
         $container = $this->getContainerBuilder();
         $chain = $container->getDefinitionByType(Chain::class);
         assert($chain instanceof ServiceDefinition);
 
-        if ($this->config->versioning) {
+        if ($config->versioning) {
             // custom implementations registered by the application replace the default ones
             $this->removeDefaultIfOverridden(VersionResolver::class, $this->prefix('versioning.resolver'));
             $this->removeDefaultIfOverridden(RejectionFactory::class, $this->prefix('versioning.rejection'));
 
-            $position = $this->config->versioning->position;
+            $position = $config->versioning->position;
 
             $chain->addSetup('$service->add(?, ?)->after(?)->before(?)', [
                 self::VERSIONING_FILTER,
@@ -92,9 +95,18 @@ class RestinoExtension extends CompilerExtension
             ]);
         }
 
-        foreach ($this->config->filters as $name => $filter) {
+        foreach ($config->filters as $name => $filter) {
             $chain->addSetup('add', [ $name, $filter ]);
         }
+    }
+
+    /**
+     * Normalized configuration (structure defined by getConfigSchema)
+     */
+    protected function getSettings(): \stdClass
+    {
+        assert($this->config instanceof \stdClass);
+        return $this->config;
     }
 
     protected function loadCollection(\stdClass $config): void

@@ -16,7 +16,7 @@ class Group
 
     public function add(Endpoint $endpoint): void
     {
-        $endpoint->path = rtrim(preg_replace('#/+#i', '/', "{$this->path}/{$endpoint->path}"), '/');
+        $endpoint->path = rtrim((string) preg_replace('#/+#i', '/', "{$this->path}/{$endpoint->path}"), '/');
 
         $this->endpoints[] = $endpoint;
     }

@@ -8,6 +8,7 @@ class Endpoint
 
     public string $method;
 
+    /** @var class-string */
     public string $controller;
 
     public string $action;
@@ -18,6 +19,9 @@ class Endpoint
     /** endpoint is available for clients with version < before (null = no upper bound) */
     public ?int $before;
 
+    /**
+     * @param class-string $controller
+     */
     public function __construct(string $path, string $method, string $controller, string $action, ?int $since = null, ?int $before = null)
     {
         if ($since !== null && $before !== null && $since >= $before) {
@@ -72,7 +76,7 @@ class Endpoint
     public function getPattern(): string
     {
         // /api/users/{id}
-        return preg_replace('#\{([a-zA-Z0-9_]+)\}#', '(?P<$1>[a-zA-Z0-9_-]+)', $this->path);
+        return (string) preg_replace('#\{([a-zA-Z0-9_]+)\}#', '(?P<$1>[a-zA-Z0-9_-]+)', $this->path);
 
         // /api/users/{id?}
 //        return preg_replace_callback(
