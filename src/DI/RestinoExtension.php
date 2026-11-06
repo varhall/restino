@@ -171,6 +171,9 @@ class RestinoExtension extends CompilerExtension
             ->setFactory(Inventory::class);
     }
 
+    /**
+     * @param class-string $type
+     */
     protected function removeDefaultIfOverridden(string $type, string $default): void
     {
         $builder = $this->getContainerBuilder();

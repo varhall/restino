@@ -17,9 +17,15 @@ class ControllerFactory implements IPresenterFactory
         $this->factory = $factory;
     }
 
+    /**
+     * For Restino requests ("Restino:<controller class>") returns the controller class
+     */
     public function getPresenterClass(string &$name): string
     {
-        return $this->getControllerClass($name) ?? $this->factory->getPresenterClass($name);
+        /** @var class-string<IPresenter> $class (controller class stands for the presenter in Restino requests) */
+        $class = $this->getControllerClass($name) ?? $this->factory->getPresenterClass($name);
+
+        return $class;
     }
 
     public function createPresenter(string $name): IPresenter
